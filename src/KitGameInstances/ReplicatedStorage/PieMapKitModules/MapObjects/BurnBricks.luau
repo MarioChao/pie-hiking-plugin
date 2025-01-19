@@ -78,6 +78,11 @@ local function burnPieServer(pie: Model, brickAttributes: BurnBrickAttributes)
 	local burnColor = brickAttributes["BurnColor"] or Color3.new()
 	local burnSeconds = brickAttributes["BurnSeconds"] or 1
 
+	-- Validate color
+	if typeof(burnColor) == "BrickColor" then
+		burnColor = (burnColor :: BrickColor).Color
+	end
+
 	-- Burn & destroy pie
 	task.defer(function()
 		burnPieAction(pie, burnColor)
@@ -95,6 +100,11 @@ local function onBurnBrickTouched(brickAttributes: BurnBrickAttributes, otherPar
 	-- Get burn info
 	local burnColor = brickAttributes["BurnColor"] or Color3.new()
 	local burnSeconds = brickAttributes["BurnSeconds"] or 1
+
+	-- Validate color
+	if typeof(burnColor) == "BrickColor" then
+		burnColor = (burnColor :: BrickColor).Color
+	end
 
 	-- Burn & destroy pie
 	task.defer(function()
