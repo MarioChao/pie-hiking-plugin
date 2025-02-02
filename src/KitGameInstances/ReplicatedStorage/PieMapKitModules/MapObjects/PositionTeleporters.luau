@@ -83,7 +83,7 @@ local function onTeleporterActivated(container: Instance, character: Model)
 	-- character:PivotTo(destinationCFrame)
 end
 
--- For subcontainer 1
+-- For subcontainer 1 (teleporters)
 
 local function setUpChildObject1(container: Instance, part: BasePart)
 	-- Get container connections
@@ -186,6 +186,7 @@ local function setUpObjectSubcontainer1(container: Instance)
 end
 
 -- For subcontainer 2 (if needed)
+-- nothing
 
 -- The container
 
@@ -205,11 +206,11 @@ end
 local function cleanUpObjectContainer(container: Instance)
 	-- Disconnect and remove stored connections
 	if taggedContainerConnections[container] then
-		for object, objectConnections in taggedContainerConnections[container] do
-			for _, connection in objectConnections do
+		for object, connections in taggedContainerConnections[container] do
+			for _, connection in connections do
 				connection:Disconnect()
 			end
-			objectConnections[object] = nil
+			taggedContainerConnections[container][object] = nil
 		end
 		taggedContainerConnections[container] = nil
 	end
