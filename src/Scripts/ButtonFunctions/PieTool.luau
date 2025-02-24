@@ -9,6 +9,7 @@ local Module = {}
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Selection = game:GetService("Selection")
 local ServerScriptService = game:GetService("ServerScriptService")
+local ServerStorage = game:GetService("ServerStorage")
 local StarterPack = game:GetService("StarterPack")
 local StarterPlayer = game:GetService("StarterPlayer")
 
@@ -20,7 +21,7 @@ local HeartPie: Tool
 
 local DevPackages = PluginFolder:FindFirstChild("DevPackages")
 if DevPackages then
-	-- This is for type-checking with the LSP on VSCode
+	-- This is for type-checking with Roblox LSP on VSCode
 	local DevPackagesIndex = DevPackages._Index
 	HeartPie = DevPackagesIndex["mariochao_heart-pie@1.0.0"]["heart-pie"]
 end
@@ -40,19 +41,26 @@ end
 local function setUpPieToolContainers(): {Instance}
 	local addedInstances = {}
 
-	for _, object in HeartPie["ContainerScripts (see ReadMe)"].ReplicatedStorage:GetChildren() do
+	local HeartPie_ContainerScripts = HeartPie:FindFirstChild("ContainerScripts (see ReadMe)")
+	for _, object in HeartPie_ContainerScripts.ReplicatedStorage:GetChildren() do
 		removeDupes(ReplicatedStorage, object.Name)
 		local newObject = object:Clone()
 		newObject.Parent = ReplicatedStorage
 		table.insert(addedInstances, newObject)
 	end
-	for _, object in HeartPie["ContainerScripts (see ReadMe)"].ServerScriptService:GetChildren() do
+	for _, object in HeartPie_ContainerScripts.ServerScriptService:GetChildren() do
 		removeDupes(ServerScriptService, object.Name)
 		local newObject = object:Clone()
 		newObject.Parent = ServerScriptService
 		table.insert(addedInstances, newObject)
 	end
-	for _, object in HeartPie["ContainerScripts (see ReadMe)"].StarterPlayerScripts:GetChildren() do
+	for _, object in HeartPie_ContainerScripts.ServerStorage:GetChildren() do
+		removeDupes(ServerStorage, object.Name)
+		local newObject = object:Clone()
+		newObject.Parent = ServerStorage
+		table.insert(addedInstances, newObject)
+	end
+	for _, object in HeartPie_ContainerScripts.StarterPlayerScripts:GetChildren() do
 		removeDupes(StarterPlayer.StarterPlayerScripts, object.Name)
 		local newObject = object:Clone()
 		newObject.Parent = StarterPlayer.StarterPlayerScripts
@@ -69,6 +77,7 @@ local function insertPieTool(): {Instance}
 	end
 
 	local newHeartPie: typeof(HeartPie) = HeartPie:Clone()
+	newHeartPie:SetAttribute("IsClientPieType", true)
 	newHeartPie.Parent = StarterPack
 
 	return {newHeartPie}
