@@ -19,6 +19,8 @@ local PluginFolder = script.Parent.Parent.Parent
 
 local HeartPie: Tool
 
+local HeartPie_ContainerScripts
+
 local DevPackages = PluginFolder:FindFirstChild("DevPackages")
 if DevPackages then
 	-- This is for type-checking with Roblox LSP on VSCode
@@ -38,32 +40,81 @@ local function removeDupes(parent: Instance, childName: string)
 	end
 end
 
+local function replaceIfNotFound(parent: Instance, child: Instance)
+	local addedInstances = {}
+	if not parent:FindFirstChild(child.Name) then
+		local newObject = child:Clone()
+		newObject.Parent = parent
+		table.insert(addedInstances, newObject)
+	end
+	return addedInstances
+end
+
+local function replaceWithNew(parent: Instance, child: Instance)
+	removeDupes(parent, child.Name)
+	local newObject = child:Clone()
+	newObject.Parent = parent
+	return newObject
+end
+
+---------- Set up functions ----------
+
 local function setUpPieToolContainers(): {Instance}
 	local addedInstances = {}
 
-	local HeartPie_ContainerScripts = HeartPie:FindFirstChild("ContainerScripts (see ReadMe)")
+	local canSetUp = (
+		(HeartPie_ContainerScripts and HeartPie_ContainerScripts:IsA("Folder"))
+		and HeartPie_ContainerScripts:FindFirstChild("ReplicatedStorage")
+	)
+	if not canSetUp then
+		warn("Set up error: can't set up heart pie!")
+	end
+
 	for _, object in HeartPie_ContainerScripts.ReplicatedStorage:GetChildren() do
-		removeDupes(ReplicatedStorage, object.Name)
-		local newObject = object:Clone()
-		newObject.Parent = ReplicatedStorage
+		-- Special case
+		if object.Name == "PieHikingModules" then
+			for _, object_2 in object:GetChildren() do
+				-- Special case
+				if object_2.Name == "PieHitEffects" or object_2.Name == "EffectsList" then
+					local newReplaced = replaceIfNotFound(ReplicatedStorage[object.Name], object_2)
+					table.move(newReplaced, 1, #newReplaced, #addedInstances + 1, addedInstances)
+					continue
+				end
+
+				local newObject = replaceWithNew(ReplicatedStorage[object.Name], object_2)
+				table.insert(addedInstances, newObject)
+			end
+			continue
+		end
+		local newObject = replaceWithNew(ReplicatedStorage, object)
 		table.insert(addedInstances, newObject)
 	end
 	for _, object in HeartPie_ContainerScripts.ServerScriptService:GetChildren() do
-		removeDupes(ServerScriptService, object.Name)
-		local newObject = object:Clone()
-		newObject.Parent = ServerScriptService
+		local newObject = replaceWithNew(ServerScriptService, object)
 		table.insert(addedInstances, newObject)
 	end
 	for _, object in HeartPie_ContainerScripts.ServerStorage:GetChildren() do
-		removeDupes(ServerStorage, object.Name)
-		local newObject = object:Clone()
-		newObject.Parent = ServerStorage
+		-- Special case
+		if object.Name == "PieHikingServerStorage" then
+			for _, object_2 in object:GetChildren() do
+				-- Special case
+				if object_2.Name == "PieSkins" or object_2.Name == "PieSkinConditions" then
+					local newReplaced = replaceIfNotFound(ServerStorage[object.Name], object_2)
+					table.move(newReplaced, 1, #newReplaced, #addedInstances + 1, addedInstances)
+					continue
+				end
+
+				local newObject = replaceWithNew(ServerStorage[object.Name], object_2)
+				table.insert(addedInstances, newObject)
+			end
+			continue
+		end
+
+		local newObject = replaceWithNew(ServerStorage, object)
 		table.insert(addedInstances, newObject)
 	end
 	for _, object in HeartPie_ContainerScripts.StarterPlayerScripts:GetChildren() do
-		removeDupes(StarterPlayer.StarterPlayerScripts, object.Name)
-		local newObject = object:Clone()
-		newObject.Parent = StarterPlayer.StarterPlayerScripts
+		local newObject = replaceWithNew(StarterPlayer.StarterPlayerScripts, object)
 		table.insert(addedInstances, newObject)
 	end
 
@@ -86,6 +137,8 @@ end
 local function refreshPieTool()
 	HeartPie = game:GetObjects("rbxassetid://18174104986")[1]
 	HeartPie.Name = `Heart Pie (from plugin)`
+
+	HeartPie_ContainerScripts = HeartPie:FindFirstChild("ContainerScripts (see ReadMe)") or HeartPie:FindFirstChild("ContainerScripts")
 end
 
 ---------- Module functions ----------

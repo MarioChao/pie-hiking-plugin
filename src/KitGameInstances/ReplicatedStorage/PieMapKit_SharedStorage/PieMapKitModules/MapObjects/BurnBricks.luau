@@ -7,8 +7,9 @@ local Module = {}
 ---------- Services ----------
 
 local Debris = game:GetService("Debris")
-local ReplicatedStorage = script.Parent.Parent.Parent or game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+
+local PieMapKit_SharedStorage = script.Parent.Parent.Parent
 
 ---------- Types ----------
 
@@ -19,7 +20,7 @@ type BurnBrickAttributes = {
 
 ---------- Instances ----------
 
-local PieMapKitEvents = ReplicatedStorage:WaitForChild("PieMapKitEvents")
+local PieMapKitEvents = PieMapKit_SharedStorage:WaitForChild("PieMapKitEvents")
 local BurnPieRemote = PieMapKitEvents.BurnPieRemote
 
 ---------- Variables ----------
@@ -65,6 +66,8 @@ local function burnPieAction(pie: Model, burnColor: Color3)
 			object.Color = burnColor
 		elseif object:IsA("DataModelMesh") then
 			object.VertexColor = Vector3.new(burnColor.R, burnColor.G, burnColor.B)
+		elseif object:IsA("Fire") then
+			-- object.Color = burnColor
 		end
 	end
 end

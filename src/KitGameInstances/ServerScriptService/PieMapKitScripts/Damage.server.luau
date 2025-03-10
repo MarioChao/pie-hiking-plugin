@@ -13,9 +13,11 @@ end
 
 local ReplicatedStorage = script.Parent.Parent.Parent:FindFirstChild("ReplicatedStorage") or game:GetService("ReplicatedStorage")
 
+local PieMapKit_SharedStorage = ReplicatedStorage:FindFirstChild("PieMapKit_SharedStorage")
+
 ---------- Instances ----------
 
-local PieMapKitEvents = ReplicatedStorage.PieMapKitEvents
+local PieMapKitEvents = PieMapKit_SharedStorage.PieMapKitEvents
 local DamageBindable = PieMapKitEvents.DamageBindable
 local DamageRemote = PieMapKitEvents.DamageRemote
 

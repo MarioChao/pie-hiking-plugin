@@ -7,8 +7,9 @@ local Module = {}
 ---------- Services ----------
 
 local Players = game:GetService("Players")
-local ReplicatedStorage = script.Parent.Parent.Parent or game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+
+local PieMapKit_SharedStorage = script.Parent.Parent.Parent
 
 ---------- Types ----------
 
@@ -20,7 +21,7 @@ type DamageBrickAttributes = {
 
 ---------- Instances ----------
 
-local PieMapKitEvents = ReplicatedStorage:WaitForChild("PieMapKitEvents")
+local PieMapKitEvents = PieMapKit_SharedStorage:WaitForChild("PieMapKitEvents")
 local DamageBindable = PieMapKitEvents.DamageBindable
 local DamageRemote = PieMapKitEvents.DamageRemote
 

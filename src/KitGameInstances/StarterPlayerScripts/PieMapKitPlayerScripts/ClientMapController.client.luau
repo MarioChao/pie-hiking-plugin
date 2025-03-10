@@ -14,16 +14,18 @@ end
 local Debris = game:GetService("Debris")
 local ReplicatedStorage = script.Parent.Parent.Parent:FindFirstChild("ReplicatedStorage") or game:GetService("ReplicatedStorage")
 
+local PieMapKit_SharedStorage = ReplicatedStorage:WaitForChild("PieMapKit_SharedStorage")
+
 ---------- Imports ----------
 
-local PieMapKitModules = ReplicatedStorage:WaitForChild("PieMapKitModules")
+local PieMapKitModules = PieMapKit_SharedStorage:WaitForChild("PieMapKitModules")
 require(PieMapKitModules.MapObjects)
 
 ---------- Types ----------
 
 ---------- Instances ----------
 
-local PieMapKitEvents = ReplicatedStorage:WaitForChild("PieMapKitEvents")
+local PieMapKitEvents = PieMapKit_SharedStorage:WaitForChild("PieMapKitEvents")
 local LoadDreamRemote = PieMapKitEvents.LoadDreamRemote
 
 ---------- Variables ----------

@@ -15,9 +15,11 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = script.Parent.Parent.Parent:FindFirstChild("ReplicatedStorage") or game:GetService("ReplicatedStorage")
 local ServerStorage = game:GetService("ServerStorage")
 
+local PieMapKit_SharedStorage = ReplicatedStorage:FindFirstChild("PieMapKit_SharedStorage")
+
 ---------- Imports ----------
 
-local PieMapKitModules = ReplicatedStorage:WaitForChild("PieMapKitModules")
+local PieMapKitModules = PieMapKit_SharedStorage:WaitForChild("PieMapKitModules")
 local DreamMaps = require(PieMapKitModules.DreamMaps)
 require(PieMapKitModules.MapObjects)
 
@@ -25,7 +27,7 @@ require(PieMapKitModules.MapObjects)
 
 ---------- Instances ----------
 
-local PieMapKitEvents = ReplicatedStorage:WaitForChild("PieMapKitEvents")
+local PieMapKitEvents = PieMapKit_SharedStorage:WaitForChild("PieMapKitEvents")
 local LoadDreamBindable = PieMapKitEvents.LoadDreamBindable
 local LoadDreamRemote = PieMapKitEvents.LoadDreamRemote
 local LightingBindable = PieMapKitEvents.LightingBindable

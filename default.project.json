@@ -3,5 +3,5 @@
 	"tree": {
 		"$path": "src"
 	},
-	"emitLegacyScripts": false
+	"emitLegacyScripts": true
 }
