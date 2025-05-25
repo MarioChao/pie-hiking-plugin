@@ -1,8 +1,10 @@
 --!strict
 -- Template Object Module
 
+
 ---------- Module ----------
 local Module = {}
+
 
 ---------- Services ----------
 
@@ -10,15 +12,19 @@ local Debris = game:GetService("Debris")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
+
 ---------- Types ----------
 
+
 ---------- Instances ----------
+
 
 ---------- Variables ----------
 
 local taggedConnections: {[BasePart]: {RBXScriptConnection}} = {}
 
 local playerCheckpoint: {[Player]: BasePart} = {}
+
 
 ---------- Local functions ----------
 -- Define general functions here
@@ -87,6 +93,7 @@ local function validateObject(object: Instance)
 	return object:IsA("BasePart")
 end
 
+
 ---------- Event functions ----------
 
 local function onCharacterAdded(character: Model, player: Player)
@@ -133,6 +140,7 @@ local function allPlayerEvents()
 	Players.PlayerRemoving:Connect(onPlayerRemoving)
 end
 
+
 ---------- Module functions ----------
 
 function Module.addInstance(object: Instance)
@@ -160,6 +168,7 @@ function Module.removeInstance(object: Instance)
 	cleanUpObject(object)
 end
 
+
 ---------- Set up function ----------
 local function initSetUp()
 	if RunService:IsClient() then
@@ -171,8 +180,10 @@ local function initSetUp()
 	end
 end
 
+
 ---------- Calling / connecting functions ----------
 initSetUp()
+
 
 ---------- Return module ----------
 return Module

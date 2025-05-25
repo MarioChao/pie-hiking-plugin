@@ -1,12 +1,15 @@
 --!strict
 -- Map Objects Module
 
+
 ---------- Module ----------
 local MapObjects = {}
+
 
 ---------- Services ----------
 
 local CollectionService = game:GetService("CollectionService")
+
 
 ---------- Imports ----------
 
@@ -15,12 +18,14 @@ local DamageBricks = require(script.DamageBricks)
 local HikeCheckpoints = require(script.HikeCheckpoints)
 local PositionTeleporters = require(script.PositionTeleporters)
 
+
 ---------- Types ----------
 
 type ObjectModule = {
 	addInstance: (Instance) -> any,
 	removeInstance: (Instance) -> any,
 }
+
 
 ---------- Variables ----------
 
@@ -30,6 +35,7 @@ local objectTagNames: {[string]: ObjectModule} = {
 	["HikeCheckpoint"] = HikeCheckpoints,
 	["PositionTeleporter"] = PositionTeleporters,
 }
+
 
 ---------- Event functions ----------
 
@@ -46,6 +52,7 @@ local function setUpTags()
 	end
 end
 
+
 ---------- Set up function ----------
 local function initSetUp()
 	setUpTags()
@@ -55,6 +62,7 @@ end
 ---------- Calling / connecting functions ----------
 
 initSetUp()
+
 
 ---------- Return module ----------
 return 1

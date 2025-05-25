@@ -1,8 +1,10 @@
 --!strict
 -- Position Teleporters Module
 
+
 ---------- Module ----------
 local Module = {}
+
 
 ---------- Services ----------
 
@@ -10,11 +12,14 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = script.Parent.Parent.Parent or game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 
+
 ---------- Types ----------
 
 type ObjectConnections = {[Instance]: {RBXScriptConnection}}
 
+
 ---------- Instances ----------
+
 
 ---------- Variables ----------
 
@@ -22,6 +27,7 @@ local containerName1 = "Teleporters"
 local containerName2 = "Destinations"
 
 local taggedContainerConnections: {[Instance]: ObjectConnections} = {}
+
 
 ---------- Helper functions ----------
 
@@ -35,6 +41,7 @@ local function createDefault<K, V>(table: {[K]: V}, key: K, default: V)
 		table[key] = default
 	end
 end
+
 
 ---------- Local functions ----------
 -- Define general functions here
@@ -220,6 +227,7 @@ local function validateObject(object: Instance)
 	return object:IsA("Instance")
 end
 
+
 ---------- Module functions ----------
 
 function Module.addInstance(object: Instance)
@@ -246,6 +254,7 @@ function Module.removeInstance(object: Instance)
 	-- Clean up object
 	cleanUpObjectContainer(object)
 end
+
 
 ---------- Return module ----------
 return Module

@@ -1,6 +1,7 @@
 --!strict
 -- Client Map Controller Script
 
+
 ---------- Validate container ----------
 -- Validate the script's container before running any code
 
@@ -9,6 +10,7 @@ if not script:FindFirstAncestorWhichIsA("PlayerScripts") then
 	return
 end
 
+
 ---------- Services ----------
 
 local Debris = game:GetService("Debris")
@@ -16,21 +18,26 @@ local ReplicatedStorage = script.Parent.Parent.Parent:FindFirstChild("Replicated
 
 local PieMapKit_SharedStorage = ReplicatedStorage:WaitForChild("PieMapKit_SharedStorage")
 
+
 ---------- Imports ----------
 
 local PieMapKitModules = PieMapKit_SharedStorage:WaitForChild("PieMapKitModules")
 require(PieMapKitModules.MapObjects)
 
+
 ---------- Types ----------
+
 
 ---------- Instances ----------
 
 local PieMapKitEvents = PieMapKit_SharedStorage:WaitForChild("PieMapKitEvents")
 local LoadDreamRemote = PieMapKitEvents.LoadDreamRemote
 
+
 ---------- Variables ----------
 
 local clientMapFolders: {[Instance]: Folder} = {}
+
 
 ---------- Local functions ----------
 -- Define general functions here
@@ -64,6 +71,7 @@ local function unloadDream(dreamFolder: Instance)
 	clearDream(dreamFolder)
 end
 
+
 ---------- Event functions ----------
 -- Functions that are directly connected by events or signals
 
@@ -74,6 +82,7 @@ local function onLoadDreamClientEvent(action: string, ...)
 		unloadDream(...)
 	end
 end
+
 
 ---------- Calling / connecting functions ----------
 -- Connect functions to events and signals, then call set up functions

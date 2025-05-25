@@ -1,6 +1,7 @@
 --!strict
 -- Server Map Controller Script
 
+
 ---------- Validate container ----------
 -- Validate the script's container before running any code
 
@@ -8,6 +9,7 @@
 if not script:FindFirstAncestorWhichIsA("ServerScriptService") then
 	return
 end
+
 
 ---------- Services ----------
 
@@ -17,13 +19,16 @@ local ServerStorage = game:GetService("ServerStorage")
 
 local PieMapKit_SharedStorage = ReplicatedStorage:FindFirstChild("PieMapKit_SharedStorage")
 
+
 ---------- Imports ----------
 
 local PieMapKitModules = PieMapKit_SharedStorage:WaitForChild("PieMapKitModules")
 local DreamMaps = require(PieMapKitModules.DreamMaps)
 require(PieMapKitModules.MapObjects)
 
+
 ---------- Types ----------
+
 
 ---------- Instances ----------
 
@@ -39,6 +44,7 @@ local DreamStorage = ServerStorage:FindFirstChild("DreamStorage") or Instance.ne
 DreamStorage.Name = "DreamStorage"
 DreamStorage.Parent = ServerStorage
 
+
 ---------- Variables ----------
 
 local mapTagName = "HikeMap"
@@ -46,6 +52,7 @@ local mapTagName = "HikeMap"
 local savedMapFolder: {[Instance]: Folder} = {}
 
 local activeClientDreamMapFolder: {[Instance]: Instance} = {}
+
 
 ---------- Local functions ----------
 -- Define general functions here
@@ -98,6 +105,7 @@ local function unloadDream(dreamFolder: Instance)
 	end
 end
 
+
 ---------- Event functions ----------
 -- Functions that are directly connected by events or signals
 
@@ -145,6 +153,7 @@ local function onLoadDreamBindableEvent(action: string, ...)
 	end
 end
 
+
 ---------- Set up function ----------
 local function initSetUp()
 	-- Dream maps
@@ -159,6 +168,7 @@ local function initSetUp()
 	-- Players
 	allPlayerEvents()
 end
+
 
 ---------- Calling / connecting functions ----------
 -- Connect functions to events and signals, then call set up functions

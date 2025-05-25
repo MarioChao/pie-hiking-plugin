@@ -1,8 +1,10 @@
 --!strict
 -- Damage Bricks Module
 
+
 ---------- Module ----------
 local Module = {}
+
 
 ---------- Services ----------
 
@@ -10,6 +12,7 @@ local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
 local PieMapKit_SharedStorage = script.Parent.Parent.Parent
+
 
 ---------- Types ----------
 
@@ -19,15 +22,18 @@ type DamageBrickAttributes = {
 	DamagesPlayer: boolean,
 }
 
+
 ---------- Instances ----------
 
 local PieMapKitEvents = PieMapKit_SharedStorage:WaitForChild("PieMapKitEvents")
 local DamageBindable = PieMapKitEvents.DamageBindable
 local DamageRemote = PieMapKitEvents.DamageRemote
 
+
 ---------- Variables ----------
 
 local taggedConnections: {[BasePart]: {RBXScriptConnection}} = {}
+
 
 ---------- Helper functions ----------
 
@@ -53,6 +59,7 @@ local function getAndValidateCharacterFromPart(part: BasePart): Model?
 	-- Return
 	return character
 end
+
 
 ---------- Local functions ----------
 -- Define general functions here
@@ -152,6 +159,7 @@ local function validateObject(object: Instance)
 	return object:IsA("BasePart")
 end
 
+
 ---------- Module functions ----------
 
 function Module.addInstance(object: Instance)
@@ -178,6 +186,7 @@ function Module.removeInstance(object: Instance)
 	-- Clean up object
 	cleanUpObject(object)
 end
+
 
 ---------- Return module ----------
 return Module

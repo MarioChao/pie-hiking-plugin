@@ -1,6 +1,7 @@
 --!strict
 -- Pie Hiking Plugin
 
+
 ---------- Validate environment ----------
 -- Validate the script's environment before running any code
 
@@ -10,6 +11,7 @@ local RunService = game:GetService("RunService")
 if not RunService:IsEdit() then
 	return
 end
+
 
 ---------- Imports ----------
 
@@ -41,6 +43,7 @@ local widgetInfo = DockWidgetPluginGuiInfo.new(
 	200
 )
 
+
 ---------- Plugin event functions ----------
 
 local function onPieHikingToolbarButtonClicked()
@@ -52,6 +55,7 @@ local function onPieHikingWidgetClosed()
 	PieHikingToolbarButton:SetActive(false)
 	PieHikingWidget.Enabled = false
 end
+
 
 ---------- Local functions ----------
 
@@ -118,7 +122,9 @@ local function setUpPluginWidgetUis()
 	end
 end
 
+
 ---------- Event functions ----------
+
 
 ---------- Set up function ----------
 local function initSetUp()
@@ -127,6 +133,7 @@ local function initSetUp()
 	setUpPluginWidgetButtons()
 	setUpPluginWidgetUis()
 end
+
 
 ---------- Calling / connecting functions ----------
 

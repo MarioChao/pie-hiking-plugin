@@ -2,18 +2,23 @@
 -- Template Object Container Module
 -- For tagged containers
 
+
 ---------- Module ----------
 local Module = {}
+
 
 ---------- Services ----------
 
 local ReplicatedStorage = script.Parent.Parent.Parent or game:GetService("ReplicatedStorage")
 
+
 ---------- Types ----------
 
 type ObjectConnections = {[Instance]: {RBXScriptConnection}}
 
+
 ---------- Instances ----------
+
 
 ---------- Variables ----------
 
@@ -22,6 +27,7 @@ local containerName2 = ""
 
 local taggedContainerConnections: {[Instance]: ObjectConnections} = {}
 
+
 ---------- Helper functions ----------
 
 local function createDefault<K, V>(table: {[K]: V}, key: K, default: V)
@@ -29,6 +35,7 @@ local function createDefault<K, V>(table: {[K]: V}, key: K, default: V)
 		table[key] = default
 	end
 end
+
 
 ---------- Local functions ----------
 -- Define general functions here
@@ -136,6 +143,7 @@ local function validateObject(object: Instance)
 	return object:IsA("Instance")
 end
 
+
 ---------- Module functions ----------
 
 function Module.addInstance(object: Instance)
@@ -162,6 +170,7 @@ function Module.removeInstance(object: Instance)
 	-- Clean up object
 	cleanUpObjectContainer(object)
 end
+
 
 ---------- Return module ----------
 return Module

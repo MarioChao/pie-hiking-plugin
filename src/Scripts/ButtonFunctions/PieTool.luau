@@ -1,8 +1,10 @@
 --!strict
 -- Pie Tool Module
 
+
 ---------- Module ----------
 local Module = {}
+
 
 ---------- Services ----------
 
@@ -12,6 +14,7 @@ local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 local StarterPack = game:GetService("StarterPack")
 local StarterPlayer = game:GetService("StarterPlayer")
+
 
 ---------- Instances ----------
 
@@ -27,6 +30,7 @@ if DevPackages then
 	local DevPackagesIndex = DevPackages._Index
 	HeartPie = DevPackagesIndex["mariochao_heart-pie@1.0.0"]["heart-pie"]
 end
+
 
 ---------- Local functions ----------
 
@@ -56,6 +60,7 @@ local function replaceWithNew(parent: Instance, child: Instance)
 	newObject.Parent = parent
 	return newObject
 end
+
 
 ---------- Set up functions ----------
 
@@ -141,6 +146,7 @@ local function refreshPieTool()
 	HeartPie_ContainerScripts = HeartPie:FindFirstChild("ContainerScripts (see ReadMe)") or HeartPie:FindFirstChild("ContainerScripts")
 end
 
+
 ---------- Module functions ----------
 
 function Module.setUp()
@@ -154,6 +160,7 @@ function Module.insert()
 	local addedInstances = insertPieTool()
 	Selection:Set(addedInstances)
 end
+
 
 ---------- Return module ----------
 return Module

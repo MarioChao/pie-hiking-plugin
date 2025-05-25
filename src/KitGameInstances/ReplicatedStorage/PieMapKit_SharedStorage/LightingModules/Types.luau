@@ -1,6 +1,7 @@
 --!strict
 -- Types Module
 
+
 ---------- Types ----------
 
 export type LightingProperties = {

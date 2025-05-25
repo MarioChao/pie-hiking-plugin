@@ -1,22 +1,28 @@
 --!strict
 -- Dream Maps Module
 
+
 ---------- Module ----------
 local DreamMaps = {}
+
 
 ---------- Services ----------
 
 local CollectionService = game:GetService("CollectionService")
 
+
 ---------- Types ----------
 
+
 ---------- Instances ----------
+
 
 ---------- Variables ----------
 
 local mapTagName = "HikeMap"
 
 local storedDreamFolders: {Instance} = {}
+
 
 ---------- Module variables ----------
 
@@ -26,8 +32,10 @@ DreamMaps.dreamAdded = Instance.new("BindableEvent")
 -- Fires when a dream folder is removed (untagged)
 DreamMaps.dreamRemoved = Instance.new("BindableEvent")
 
+
 ---------- Local functions ----------
 -- Define general functions here
+
 
 ---------- Event functions ----------
 -- Functions that are directly connected by events or signals
@@ -60,11 +68,13 @@ local function onMapRemoved(map: Folder)
 	DreamMaps.dreamRemoved:Fire(dreamFolder)
 end
 
+
 ---------- Module functions ----------
 
 function DreamMaps.getAllDreams()
 	return storedDreamFolders
 end
+
 
 ---------- Set up function ----------
 local function initSetUp()
@@ -79,10 +89,12 @@ local function initSetUp()
 	CollectionService:GetInstanceRemovedSignal(mapTagName):Connect(onMapRemoved)
 end
 
+
 ---------- Calling / connecting functions ----------
 -- Connect functions to events and signals, then call set up functions
 
 task.defer(initSetUp)
+
 
 ---------- Return module ----------
 return DreamMaps

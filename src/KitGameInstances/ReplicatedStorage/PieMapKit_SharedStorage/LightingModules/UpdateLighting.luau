@@ -1,24 +1,29 @@
 --!strict
 -- Update Lighting Module
 
+
 ---------- Module ----------
 local UpdateLightingModule = {}
+
 
 ---------- Services ----------
 
 local Debris = game:GetService("Debris")
 local Lighting = game:GetService("Lighting")
 
+
 ---------- Imports ----------
 
 local LightingModules = script.Parent
 local LightingTypes = require(LightingModules.Types)
+
 
 ---------- Types ----------
 
 type LightingConfigType = LightingTypes.LightingConfigType
 type LightingProperties = LightingTypes.LightingProperties
 type PostEffectTypes = LightingTypes.PostEffectTypes
+
 
 ---------- Local functions ----------
 
@@ -103,6 +108,7 @@ local function updateSky(sky: Sky?)
 	newSky.Parent = Lighting
 end
 
+
 ---------- Module functions ----------
 function UpdateLightingModule.applyLightingConfig(lightingConfig: LightingConfigType?)
 	if not lightingConfig then
@@ -115,6 +121,7 @@ function UpdateLightingModule.applyLightingConfig(lightingConfig: LightingConfig
 	updateSky(lightingConfig.Sky)
 
 end
+
 
 ---------- Return module ----------
 return UpdateLightingModule

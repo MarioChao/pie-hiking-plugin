@@ -1,8 +1,10 @@
 --!strict
 -- Burn Bricks Module
 
+
 ---------- Module ----------
 local Module = {}
+
 
 ---------- Services ----------
 
@@ -11,6 +13,7 @@ local RunService = game:GetService("RunService")
 
 local PieMapKit_SharedStorage = script.Parent.Parent.Parent
 
+
 ---------- Types ----------
 
 type BurnBrickAttributes = {
@@ -18,14 +21,17 @@ type BurnBrickAttributes = {
 	BurnSeconds: number,
 }
 
+
 ---------- Instances ----------
 
 local PieMapKitEvents = PieMapKit_SharedStorage:WaitForChild("PieMapKitEvents")
 local BurnPieRemote = PieMapKitEvents.BurnPieRemote
 
+
 ---------- Variables ----------
 
 local taggedConnections: {[BasePart]: {RBXScriptConnection}} = {}
+
 
 ---------- Helper functions ----------
 
@@ -45,6 +51,7 @@ local function getPieModel(instance: Instance?): Model?
 	end
 	return nil
 end
+
 
 ---------- Local functions ----------
 -- Define general functions here
@@ -170,6 +177,7 @@ local function validatePieOwner(pie: Model, player: Player): boolean
 	return Creator == player
 end
 
+
 ---------- Event functions ----------
 
 local function onBurnPieServerEvent(caller: Player, action: string, pie: Model, ...)
@@ -183,6 +191,7 @@ local function onBurnPieServerEvent(caller: Player, action: string, pie: Model, 
 		burnPieServer(pie, ...)
 	end
 end
+
 
 ---------- Module functions ----------
 
@@ -211,11 +220,13 @@ function Module.removeInstance(object: Instance)
 	cleanUpObject(object)
 end
 
+
 ---------- Calling / connecting functions ----------
 
 if RunService:IsServer() then
 	BurnPieRemote.OnServerEvent:Connect(onBurnPieServerEvent)
 end
+
 
 ---------- Return module ----------
 return Module

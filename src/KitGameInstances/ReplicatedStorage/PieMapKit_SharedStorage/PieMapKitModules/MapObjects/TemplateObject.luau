@@ -2,22 +2,29 @@
 -- Template Object Module
 -- For directly tagged parts
 
+
 ---------- Module ----------
 local Module = {}
+
 
 ---------- Services ----------
 
 local ReplicatedStorage = script.Parent.Parent.Parent or game:GetService("ReplicatedStorage")
 
+
 ---------- Types ----------
 
+
 ---------- Instances ----------
+
 
 ---------- Variables ----------
 
 local taggedConnections: {[BasePart]: {RBXScriptConnection}} = {}
 
+
 ---------- Helper functions ----------
+
 
 ---------- Local functions ----------
 -- Define general functions here
@@ -46,6 +53,7 @@ local function validateObject(object: Instance)
 	return object:IsA("BasePart")
 end
 
+
 ---------- Module functions ----------
 
 function Module.addInstance(object: Instance)
@@ -72,6 +80,7 @@ function Module.removeInstance(object: Instance)
 	-- Clean up object
 	cleanUpObject(object)
 end
+
 
 ---------- Return module ----------
 return Module

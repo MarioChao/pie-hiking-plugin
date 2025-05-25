@@ -1,6 +1,7 @@
 --!strict
 -- Collision Groups Script
 
+
 ---------- Validate container ----------
 -- Validate the script's container before running any code
 
@@ -9,9 +10,11 @@ if not script:FindFirstAncestorWhichIsA("ServerScriptService") then
 	return
 end
 
+
 ---------- Services ----------
 
 local PhysicsService = game:GetService("PhysicsService")
+
 
 ---------- Types ----------
 
@@ -21,6 +24,7 @@ type CollisionGroupData = {
 	DoNotCollideWith: {string},
 	DoNotCreate: boolean
 }
+
 
 ---------- Variables ----------
 
@@ -51,6 +55,7 @@ local CollisionGroupsTable: {CollisionGroupData} = {
 	}
 }
 
+
 ---------- Local functions ----------
 
 local function setUpCollisionGroups()
@@ -71,6 +76,7 @@ local function setUpCollisionGroups()
 		end
 	end
 end
+
 
 ---------- Calling / connecting functions ----------
 

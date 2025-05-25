@@ -1,18 +1,22 @@
 --!strict
 -- DG Animation Module
 
+
 ---------- Module ----------
 local Module = {}
+
 
 ---------- Services ----------
 
 local Selection = game:GetService("Selection")
+
 
 ---------- Instances ----------
 
 local PluginFolder = script.Parent.Parent.Parent
 
 local AnimationSetup: Folder
+
 
 ---------- Local functions ----------
 
@@ -28,6 +32,7 @@ local function refreshAnimationSetup()
 	AnimationSetup.Name = `DG Animation Setup (from plugin)`
 end
 
+
 ---------- Module functions ----------
 
 function Module.insert()
@@ -35,6 +40,7 @@ function Module.insert()
 	local addedInstances = insertAnimationSetup()
 	Selection:Set(addedInstances)
 end
+
 
 ---------- Return module ----------
 return Module

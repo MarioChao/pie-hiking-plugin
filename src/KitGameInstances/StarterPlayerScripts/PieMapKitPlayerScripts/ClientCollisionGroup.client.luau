@@ -1,6 +1,7 @@
 --!strict
 -- Client Collision Script
 
+
 ---------- Validate container ----------
 -- Validate the script's container before running any code
 
@@ -9,13 +10,16 @@ if not script:FindFirstAncestorWhichIsA("PlayerScripts") then
 	return
 end
 
+
 ---------- Services ----------
 
 local Players = game:GetService("Players")
 
+
 ---------- Instances ----------
 
 local LocalPlayer = Players.LocalPlayer or Players:GetPropertyChangedSignal("LocalPlayer"):Wait() :: Player
+
 
 ---------- Local functions ----------
 
@@ -99,6 +103,7 @@ local function setUpPlayerCollisions()
 	end)
 	Players.PlayerAdded:Connect(onOtherPlayerAdded)
 end
+
 
 ---------- Calling / connecting functions ----------
 

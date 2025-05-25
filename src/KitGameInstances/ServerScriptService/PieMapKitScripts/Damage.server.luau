@@ -1,6 +1,7 @@
 --!strict
 -- Damage Script
 
+
 ---------- Validate container ----------
 -- Validate the script's container before running any code
 
@@ -9,11 +10,13 @@ if not script:FindFirstAncestorWhichIsA("ServerScriptService") then
 	return
 end
 
+
 ---------- Services----------
 
 local ReplicatedStorage = script.Parent.Parent.Parent:FindFirstChild("ReplicatedStorage") or game:GetService("ReplicatedStorage")
 
 local PieMapKit_SharedStorage = ReplicatedStorage:FindFirstChild("PieMapKit_SharedStorage")
+
 
 ---------- Instances ----------
 
@@ -21,9 +24,11 @@ local PieMapKitEvents = PieMapKit_SharedStorage.PieMapKitEvents
 local DamageBindable = PieMapKitEvents.DamageBindable
 local DamageRemote = PieMapKitEvents.DamageRemote
 
+
 ---------- Variables ----------
 
 local characterThrottle: {[Player]: boolean} = {}
+
 
 ---------- Local functions ----------
 
@@ -65,6 +70,7 @@ local function onDamageNpc(character: Model, amount: number)
 	humanoid:TakeDamage(amount)
 end
 
+
 ---------- Event functions ----------
 
 local function onDamageBindableEvent(action: string, ...)
@@ -80,6 +86,7 @@ local function onDamageServerEvent(caller: Player, action: string, ...)
 		onDamagePlayer(caller, ...)
 	end
 end
+
 
 ---------- Calling / connecting functions ----------
 

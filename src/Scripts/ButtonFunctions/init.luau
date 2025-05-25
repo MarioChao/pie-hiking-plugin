@@ -1,12 +1,15 @@
 --!strict
 -- Button Functions Module
 
+
 ---------- Module ----------
 local ButtonFunctions = {}
+
 
 ---------- Services ----------
 
 local ChangeHistoryService = game:GetService("ChangeHistoryService")
+
 
 ---------- Imports ----------
 
@@ -14,9 +17,11 @@ local MapKit = require(script.MapKit)
 local PieTool = require(script.PieTool)
 local DGAnimation = require(script.DGAnimation)
 
+
 ---------- Local functions ----------
 
 local defaultWrapper
+
 
 ---------- Local functions ----------
 
@@ -42,6 +47,7 @@ local function setUpWrapper()
 	defaultWrapper = changeHistoryServiceWrap("Plugin error when starting recording", Enum.FinishRecordingOperation.Commit)
 end
 
+
 ---------- Module functions ----------
 
 function ButtonFunctions.setUpPieTool()
@@ -64,9 +70,11 @@ function ButtonFunctions.insertAnimation()
 	defaultWrapper("Insert animation", DGAnimation.insert)
 end
 
+
 ---------- Calling / connecting functions ----------
 
 setUpWrapper()
+
 
 ---------- Return module ----------
 return ButtonFunctions

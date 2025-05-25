@@ -1,8 +1,10 @@
 --!strict
 -- Studio Theme Module
 
+
 ---------- Module ----------
 local StudioTheme = {}
+
 
 ---------- Local functions ----------
 
@@ -33,11 +35,13 @@ local function syncGuiColors(objects)
 	settings().Studio.ThemeChanged:Connect(setColors)
 end
 
+
 ---------- Module functions ----------
 
 function StudioTheme.syncGuiColors(objects: {Instance})
 	syncGuiColors(objects)
 end
+
 
 ---------- Return module ----------
 return StudioTheme

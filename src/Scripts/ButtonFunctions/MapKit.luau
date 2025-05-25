@@ -1,8 +1,10 @@
 --!strict
 -- Map Kit Module
 
+
 ---------- Module ----------
 local Module = {}
+
 
 ---------- Services ----------
 
@@ -11,12 +13,14 @@ local Selection = game:GetService("Selection")
 local ServerScriptService = game:GetService("ServerScriptService")
 local StarterPlayer = game:GetService("StarterPlayer")
 
+
 ---------- Instances ----------
 
 local PluginFolder = script.Parent.Parent.Parent
 
 local KitGameInstances = PluginFolder.KitGameInstances
 local PieHikingMapKit: Folder
+
 
 ---------- Local functions ----------
 
@@ -92,6 +96,7 @@ local function refreshMapKit()
 	PieHikingMapKit.Name = `Pie Hiking Map Kit (from plugin)`
 end
 
+
 ---------- Module functions ----------
 
 function Module.setUp()
@@ -105,6 +110,7 @@ function Module.insert()
 	local addedInstances = insertMapKit()
 	Selection:Set(addedInstances)
 end
+
 
 ---------- Return module ----------
 return Module
