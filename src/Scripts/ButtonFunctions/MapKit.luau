@@ -11,6 +11,7 @@ local Module = {}
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Selection = game:GetService("Selection")
 local ServerScriptService = game:GetService("ServerScriptService")
+local SoundService = game:GetService("SoundService")
 local StarterPlayer = game:GetService("StarterPlayer")
 
 
@@ -74,6 +75,13 @@ local function setUpMapKitContainers(): {Instance}
 		local newObject = object:Clone()
 		enableDescendantScripts(newObject)
 		newObject.Parent = StarterPlayer.StarterPlayerScripts
+		table.insert(addedInstances, newObject)
+	end
+	for _, object in KitGameInstances.SoundService:GetChildren() do
+		removeDupes(SoundService, object.Name)
+		local newObject = object:Clone()
+		enableDescendantScripts(newObject)
+		newObject.Parent = SoundService
 		table.insert(addedInstances, newObject)
 	end
 

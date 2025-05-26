@@ -1,0 +1,8 @@
+{
+	"properties": {
+		"Disabled": true,
+		"Attributes": {
+			"Enabled": {"Bool": true}
+		}
+	}
+}

@@ -24,6 +24,10 @@
 		{
 			"Name": "BurnPieRemote",
 			"ClassName": "RemoteEvent"
+		},
+		{
+			"Name": "MusicBindable",
+			"ClassName": "BindableEvent"
 		}
 	]
 }

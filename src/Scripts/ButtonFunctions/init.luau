@@ -18,7 +18,7 @@ local PieTool = require(script.PieTool)
 local DGAnimation = require(script.DGAnimation)
 
 
----------- Local functions ----------
+---------- Variables ----------
 
 local defaultWrapper
 
