@@ -17,6 +17,7 @@ local BurnBricks = require(script.BurnBricks)
 local DamageBricks = require(script.DamageBricks)
 local HikeCheckpoints = require(script.HikeCheckpoints)
 local PositionTeleporters = require(script.PositionTeleporters)
+local MusicZones = require(script.MusicZones)
 
 
 ---------- Types ----------
@@ -34,6 +35,7 @@ local objectTagNames: {[string]: ObjectModule} = {
 	["DamageBrick"] = DamageBricks,
 	["HikeCheckpoint"] = HikeCheckpoints,
 	["PositionTeleporter"] = PositionTeleporters,
+	["MusicZone"] = MusicZones,
 }
 
 
