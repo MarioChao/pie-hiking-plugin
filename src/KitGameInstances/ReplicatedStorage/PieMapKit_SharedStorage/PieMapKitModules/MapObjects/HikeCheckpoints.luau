@@ -1,5 +1,5 @@
 --!strict
--- Template Object Module
+-- Hike Checkpoints Module
 
 
 ---------- Module ----------

@@ -9,7 +9,7 @@ local Module = {}
 
 ---------- Services ----------
 
-local ReplicatedStorage = script.Parent.Parent.Parent or game:GetService("ReplicatedStorage")
+local PieMapKit_SharedStorage = script.Parent.Parent.Parent
 
 
 ---------- Types ----------
