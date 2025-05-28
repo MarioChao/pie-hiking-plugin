@@ -141,6 +141,11 @@ local function checkMusicZonesFrame()
 	-- Get player parts
 	local playerParts = getPlayerParts(LocalPlayer)
 
+	-- Validate player alive
+	if #playerParts == 0 then
+		return
+	end
+
 	-- Get zones that contain the player
 	local highestPriority = nil
 	local priorityContainers: {[number]: {Instance}} = {}
