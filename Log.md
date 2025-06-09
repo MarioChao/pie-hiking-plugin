@@ -1,6 +1,11 @@
 # Logs
 
 
+## 2025/06/09
+
+Fixed pie not setting up correctly when `PieHikingModules` or `PieHikingServerStorage` isn't found in their respective container services.
+
+
 ## 2025/05/26 - 05/28
 
 Added `PieMapKit_Audio` folder in `SoundService` to play background music.
