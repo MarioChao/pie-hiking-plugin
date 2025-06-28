@@ -26,6 +26,8 @@ type ObjectConnections = {[Instance]: {RBXScriptConnection}}
 
 type AudioInfo = {
 	AssetId: number,
+	LoopRegion: NumberRange,
+	PlaybackRegion: NumberRange,
 	PlaybackSpeed: number,
 	Volume: number,
 }
@@ -103,6 +105,8 @@ local function playContainerMusic(container: Instance)
 	-- Get music info
 	local audioInfo: AudioInfo = {
 		AssetId = container:GetAttribute("Audio_AssetId"),
+		LoopRegion = container:GetAttribute("Audio_LoopRegion"),
+		PlaybackRegion = container:GetAttribute("Audio_PlaybackRegion"),
 		PlaybackSpeed = container:GetAttribute("Audio_PlaybackSpeed"),
 		Volume = container:GetAttribute("Audio_Volume"),
 	}

@@ -1,6 +1,11 @@
 # Logs
 
 
+## 2025/06/28
+
+Added `LoopRegion` and `PlaybackRegion` configurations for `MusicZones`.
+
+
 ## 2025/06/09
 
 Fixed pie not setting up correctly when `PieHikingModules` or `PieHikingServerStorage` isn't found in their respective container services.

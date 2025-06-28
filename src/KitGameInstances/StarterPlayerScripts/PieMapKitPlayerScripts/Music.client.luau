@@ -28,6 +28,8 @@ local PieMapKit_Audio = SoundService:WaitForChild("PieMapKit_Audio")
 
 type AudioInfo = {
 	AssetId: number,
+	LoopRegion: NumberRange,
+	PlaybackRegion: NumberRange,
 	PlaybackSpeed: number,
 	Volume: number,
 }
@@ -54,6 +56,8 @@ local timeFunction = time
 
 local defaultAudio: AudioInfo = {
 	AssetId = 9045766377,
+	LoopRegion = NumberRange.new(3.8, 72),
+	PlaybackRegion = NumberRange.new(0),
 	PlaybackSpeed = 0.8,
 	Volume = 0.5,
 }
@@ -113,9 +117,17 @@ local function setPlayedAudio(audioInfo: AudioInfo)
 
 		-- Set playback
 		AudioPlayer.PlaybackSpeed = audioInfo.PlaybackSpeed
+
+		-- Set playback & loop region
+		AudioPlayer.LoopRegion = audioInfo.LoopRegion or NumberRange.new(0)
+		AudioPlayer.PlaybackRegion = audioInfo.PlaybackRegion or NumberRange.new(0)
 	else
 		-- Set playback (maybe tween?)
 		AudioPlayer.PlaybackSpeed = audioInfo.PlaybackSpeed
+
+		-- Set playback & loop region
+		AudioPlayer.LoopRegion = audioInfo.LoopRegion or NumberRange.new(0)
+		AudioPlayer.PlaybackRegion = audioInfo.PlaybackRegion or NumberRange.new(0)
 	end
 
 	-- Fade in audio volume
