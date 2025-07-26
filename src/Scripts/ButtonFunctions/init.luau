@@ -54,8 +54,8 @@ function ButtonFunctions.setUpPieTool()
 	defaultWrapper("Set up pie tool", PieTool.setUp)
 end
 
-function ButtonFunctions.insertRegularPieTool()
-	defaultWrapper("Insert (bake) regular pie tool", PieTool.insertRegular)
+function ButtonFunctions.insertClassicPieTool()
+	defaultWrapper("Insert (bake) classic pie tool", PieTool.insertClassic)
 end
 
 function ButtonFunctions.insertBeginnerPieTool()

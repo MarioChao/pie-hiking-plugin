@@ -86,7 +86,7 @@ local function setUpPluginWidgetButtons()
 	-- Set-up button events
 	local setUpFrame = PieHikingWidgetGui.ScrollingFrame.SetUpFrame
 	setUpFrame.PieToolSetUpButton.MouseButton1Click:Connect(ButtonFunctions.setUpPieTool)
-	setUpFrame.PieToolRegularInsertButton.MouseButton1Click:Connect(ButtonFunctions.insertRegularPieTool)
+	setUpFrame.PieToolClassicInsertButton.MouseButton1Click:Connect(ButtonFunctions.insertClassicPieTool)
 	setUpFrame.PieToolBeginnerInsertButton.MouseButton1Click:Connect(ButtonFunctions.insertBeginnerPieTool)
 	setUpFrame.MapKitSetUpButton.MouseButton1Click:Connect(ButtonFunctions.setUpMapKit)
 	setUpFrame.MapKitInsertButton.MouseButton1Click:Connect(ButtonFunctions.insertMapKit)
@@ -106,7 +106,7 @@ local function setUpPluginWidgetUis()
 	MouseCursor.setPlugin(plugin)
 	local buttons = {
 		PieHikingWidgetGui.ScrollingFrame.SetUpFrame.PieToolSetUpButton,
-		PieHikingWidgetGui.ScrollingFrame.SetUpFrame.PieToolRegularInsertButton,
+		PieHikingWidgetGui.ScrollingFrame.SetUpFrame.PieToolClassicInsertButton,
 		PieHikingWidgetGui.ScrollingFrame.SetUpFrame.PieToolBeginnerInsertButton,
 		PieHikingWidgetGui.ScrollingFrame.SetUpFrame.MapKitSetUpButton,
 		PieHikingWidgetGui.ScrollingFrame.SetUpFrame.MapKitInsertButton,

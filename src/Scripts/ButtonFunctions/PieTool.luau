@@ -34,7 +34,7 @@ end
 
 ---------- Variables ----------
 
-local regularPieName = "Heart Pie (from plugin)"
+local classicPieName = "Classic Heart Pie (from plugin)"
 local beginnerPieName = "Beginner Heart Pie (from plugin)"
 
 
@@ -134,14 +134,14 @@ local function setUpPieToolContainers(): {Instance}
 	return addedInstances
 end
 
-local function insertRegularPieTool(): {Instance}
-	if StarterPack:FindFirstChild(regularPieName) then
-		warn(`A {regularPieName} already exists in StarterPack.`)
+local function insertClassicPieTool(): {Instance}
+	if StarterPack:FindFirstChild(classicPieName) then
+		warn(`A {classicPieName} already exists in StarterPack.`)
 		return {}
 	end
 
 	local newHeartPie: typeof(HeartPie) = HeartPie:Clone()
-	newHeartPie.Name = regularPieName
+	newHeartPie.Name = classicPieName
 	newHeartPie.Parent = StarterPack
 
 	return {newHeartPie}
@@ -178,9 +178,9 @@ function Module.setUp()
 	Selection:Set(addedInstances)
 end
 
-function Module.insertRegular()
+function Module.insertClassic()
 	refreshPieTool()
-	local addedInstances = insertRegularPieTool()
+	local addedInstances = insertClassicPieTool()
 	Selection:Set(addedInstances)
 end
 
