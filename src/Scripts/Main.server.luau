@@ -86,7 +86,8 @@ local function setUpPluginWidgetButtons()
 	-- Set-up button events
 	local setUpFrame = PieHikingWidgetGui.ScrollingFrame.SetUpFrame
 	setUpFrame.PieToolSetUpButton.MouseButton1Click:Connect(ButtonFunctions.setUpPieTool)
-	setUpFrame.PieToolInsertButton.MouseButton1Click:Connect(ButtonFunctions.insertPieTool)
+	setUpFrame.PieToolRegularInsertButton.MouseButton1Click:Connect(ButtonFunctions.insertRegularPieTool)
+	setUpFrame.PieToolBeginnerInsertButton.MouseButton1Click:Connect(ButtonFunctions.insertBeginnerPieTool)
 	setUpFrame.MapKitSetUpButton.MouseButton1Click:Connect(ButtonFunctions.setUpMapKit)
 	setUpFrame.MapKitInsertButton.MouseButton1Click:Connect(ButtonFunctions.insertMapKit)
 
@@ -99,15 +100,14 @@ local function setUpPluginWidgetUis()
 	-- Sync frame colors
 	StudioTheme.syncGuiColors({
 		PieHikingWidgetGui.ScrollingFrame,
-		PieHikingWidgetGui.ScrollingFrame.SetUpFrame,
-		PieHikingWidgetGui.ScrollingFrame.AnimationFrame,
 	})
 
 	-- Set up mouse cursors
 	MouseCursor.setPlugin(plugin)
 	local buttons = {
 		PieHikingWidgetGui.ScrollingFrame.SetUpFrame.PieToolSetUpButton,
-		PieHikingWidgetGui.ScrollingFrame.SetUpFrame.PieToolInsertButton,
+		PieHikingWidgetGui.ScrollingFrame.SetUpFrame.PieToolRegularInsertButton,
+		PieHikingWidgetGui.ScrollingFrame.SetUpFrame.PieToolBeginnerInsertButton,
 		PieHikingWidgetGui.ScrollingFrame.SetUpFrame.MapKitSetUpButton,
 		PieHikingWidgetGui.ScrollingFrame.SetUpFrame.MapKitInsertButton,
 		PieHikingWidgetGui.ScrollingFrame.AnimationFrame.AnimationInsertButton,

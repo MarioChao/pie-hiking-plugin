@@ -1,5 +1,5 @@
 {
-	"name": "PieHikingPlugin",
+	"name": "pie-hiking-plugin",
 	"tree": {
 		"$path": "src"
 	},

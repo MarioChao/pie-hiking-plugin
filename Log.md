@@ -1,6 +1,15 @@
 # Logs
 
 
+## 2025/07/26
+
+Added new button for baking a beginner pie.
+
+Added background colors for the plugin dock widget.
+
+Renamed project to lower-kebab case.
+
+
 ## 2025/06/28
 
 Added `LoopRegion` and `PlaybackRegion` configurations for `MusicZones`.

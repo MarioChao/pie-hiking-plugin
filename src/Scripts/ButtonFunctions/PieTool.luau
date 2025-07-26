@@ -28,8 +28,14 @@ local DevPackages = PluginFolder:FindFirstChild("DevPackages")
 if DevPackages then
 	-- This is for type-checking with Roblox LSP on VSCode
 	local DevPackagesIndex = DevPackages._Index
-	HeartPie = DevPackagesIndex["mariochao_heart-pie@1.0.0"]["heart-pie"]
+	HeartPie = DevPackagesIndex["mariochao_heart-pie@1.0.6"]["heart-pie"]
 end
+
+
+---------- Variables ----------
+
+local regularPieName = "Heart Pie (from plugin)"
+local beginnerPieName = "Beginner Heart Pie (from plugin)"
 
 
 ---------- Local functions ----------
@@ -128,14 +134,30 @@ local function setUpPieToolContainers(): {Instance}
 	return addedInstances
 end
 
-local function insertPieTool(): {Instance}
-	if StarterPack:FindFirstChild(HeartPie.Name) then
-		warn(`A {HeartPie.Name} already exists in StarterPack.`)
+local function insertRegularPieTool(): {Instance}
+	if StarterPack:FindFirstChild(regularPieName) then
+		warn(`A {regularPieName} already exists in StarterPack.`)
 		return {}
 	end
 
 	local newHeartPie: typeof(HeartPie) = HeartPie:Clone()
-	newHeartPie:SetAttribute("IsClientPieType", true)
+	newHeartPie.Name = regularPieName
+	newHeartPie.Parent = StarterPack
+
+	return {newHeartPie}
+end
+
+local function insertBeginnerPieTool(): {Instance}
+	if StarterPack:FindFirstChild(beginnerPieName) then
+		warn(`A {beginnerPieName} already exists in StarterPack.`)
+		return {}
+	end
+
+	local newHeartPie: typeof(HeartPie) = HeartPie:Clone()
+	newHeartPie.Name = beginnerPieName
+	newHeartPie:SetAttribute("CanCollideThrower", false)
+	newHeartPie:SetAttribute("LaunchOffsetStuds", 0)
+	newHeartPie:SetAttribute("LaunchVelocity", 95)
 	newHeartPie.Parent = StarterPack
 
 	return {newHeartPie}
@@ -143,7 +165,6 @@ end
 
 local function refreshPieTool()
 	HeartPie = game:GetObjects("rbxassetid://18174104986")[1]
-	HeartPie.Name = `Heart Pie (from plugin)`
 
 	HeartPie_ContainerScripts = HeartPie:FindFirstChild("ContainerScripts (see ReadMe)") or HeartPie:FindFirstChild("ContainerScripts")
 end
@@ -157,9 +178,15 @@ function Module.setUp()
 	Selection:Set(addedInstances)
 end
 
-function Module.insert()
+function Module.insertRegular()
 	refreshPieTool()
-	local addedInstances = insertPieTool()
+	local addedInstances = insertRegularPieTool()
+	Selection:Set(addedInstances)
+end
+
+function Module.insertBeginner()
+	refreshPieTool()
+	local addedInstances = insertBeginnerPieTool()
 	Selection:Set(addedInstances)
 end
 
