@@ -2,7 +2,7 @@
 name = "user/pie-hiking-plugin"
 description = "Plugin made for pie hiking."
 
-version = "1.0.0"
+version = "1.3.0"
 license = "MIT"
 authors = ["Mario Chao"]
 realm = "shared"

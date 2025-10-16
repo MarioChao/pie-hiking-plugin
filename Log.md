@@ -1,6 +1,13 @@
 # Logs
 
 
+## [v1.3.0] Hike Checkpoints Small Update | 2025/10/16
+
+Hike checkpoints update:
+- Changed the delay for setting `CFrame` from `task.wait(0.1)` to `RunService.Heartbeat:Wait()`.
+- Added `Humanoid.HipHeight` to the vertical spawning position.
+
+
 ## 2025/07/26
 
 Added new button for baking a beginner pie.

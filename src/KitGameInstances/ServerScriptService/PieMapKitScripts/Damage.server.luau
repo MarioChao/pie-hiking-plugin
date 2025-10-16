@@ -25,9 +25,16 @@ local DamageBindable = PieMapKitEvents.DamageBindable
 local DamageRemote = PieMapKitEvents.DamageRemote
 
 
+---------- Constants ----------
+
+local Constants = {}
+
+Constants.defaultDamageThrottle = 0.2
+
+
 ---------- Variables ----------
 
-local characterThrottle: {[Player]: boolean} = {}
+local characterThrottle: {[Model]: boolean} = {}
 
 
 ---------- Local functions ----------
@@ -41,7 +48,7 @@ local function onDamagePlayer(player: Player, amount: number)
 	-- Validate humanoid
 	local character = player.Character
 	local humanoid = character and character:FindFirstChildWhichIsA("Humanoid")
-	if not humanoid then
+	if not (character and humanoid) then
 		return
 	end
 
@@ -51,7 +58,7 @@ local function onDamagePlayer(player: Player, amount: number)
 	end
 	characterThrottle[character] = true
 	task.defer(function()
-		task.wait(0.2)
+		task.wait(Constants.defaultDamageThrottle)
 		characterThrottle[character] = nil
 	end)
 

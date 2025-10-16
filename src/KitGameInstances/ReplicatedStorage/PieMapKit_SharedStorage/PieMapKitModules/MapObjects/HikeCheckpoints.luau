@@ -104,17 +104,19 @@ local function onCharacterAdded(character: Model, player: Player)
 	end
 
 	-- Validate humanoid root part
-	local humanoidRootPart = character:WaitForChild("HumanoidRootPart") :: BasePart?
-	if not humanoidRootPart then
+	local humanoidRootPart = character:WaitForChild("HumanoidRootPart", 5) :: BasePart
+	local humanoid = character:WaitForChild("Humanoid") :: Humanoid
+	if not (humanoidRootPart and humanoid) then
 		return
 	end
 
 	-- Delay a bit to allow default spawn position
-	task.wait(0.1)
+	RunService.Heartbeat:Wait()
 
 	-- Move player to checkpoint
 	local checkpointCFrame = checkpointPart.CFrame
 	checkpointCFrame += Vector3.new(0, checkpointPart.Size.Y / 2, 0)
+	checkpointCFrame += Vector3.new(0, humanoid.HipHeight, 0)
 	humanoidRootPart:PivotTo(checkpointCFrame)
 	-- character:PivotTo(checkpointCFrame)
 end

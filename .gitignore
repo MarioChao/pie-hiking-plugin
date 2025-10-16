@@ -12,3 +12,5 @@ wally.lock
 **/ServerPackages/
 **/DevPackages/
 **/TestPackages/
+
+sourcemap.json

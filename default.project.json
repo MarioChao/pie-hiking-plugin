@@ -1,7 +1,13 @@
 {
 	"name": "pie-hiking-plugin",
 	"tree": {
-		"$path": "src"
+		"$className": "DataModel",
+
+		"ServerStorage": {
+			"pie-hiking-plugin": {
+				"$path": "src"
+			}
+		}
 	},
 	"emitLegacyScripts": true
 }
