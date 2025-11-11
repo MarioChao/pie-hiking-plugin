@@ -1,9 +1,6 @@
 --!strict
+
 -- Mouse Cursor Module
-
-
----------- Module ----------
-local MouseCursor = {}
 
 
 ---------- Variables ----------
@@ -18,7 +15,12 @@ local function setCursor(cursorAsset: string)
 end
 
 
----------- Module functions ----------
+---------- Module ----------
+
+local MouseCursor = {}
+
+
+---------- Module fields ----------
 
 function MouseCursor.setPlugin(thePlugin: Plugin)
 	plugin = thePlugin
@@ -30,4 +32,5 @@ end
 
 
 ---------- Return module ----------
+
 return MouseCursor

@@ -34,7 +34,7 @@ local LightingBindable = PieMapKitEvents.LightingBindable
 ---------- Local functions ----------
 
 local function loadLighting(lightingConfig: LightingTypes.LightingConfigType, name: string)
-	print(`Loading {name}'s lighting configurations`)
+	print(`[Load Lighting]: Loading {name}'s lighting configurations`)
 	UpdateLighting.applyLightingConfig(lightingConfig)
 end
 
