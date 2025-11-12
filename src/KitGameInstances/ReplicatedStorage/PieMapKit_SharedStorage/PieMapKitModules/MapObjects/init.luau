@@ -16,6 +16,7 @@ local CollectionService = game:GetService("CollectionService")
 local BurnBricks = require(script.BurnBricks)
 local DamageBricks = require(script.DamageBricks)
 local HikeCheckpoints = require(script.HikeCheckpoints)
+local Invisible = require(script.Invisible)
 local PositionTeleporters = require(script.PositionTeleporters)
 local MusicZones = require(script.MusicZones)
 
@@ -36,6 +37,7 @@ local objectTagNames: {[string]: ObjectModule} = {
 	["HikeCheckpoint"] = HikeCheckpoints,
 	["PositionTeleporter"] = PositionTeleporters,
 	["MusicZone"] = MusicZones,
+	["Invisible"] = Invisible,
 }
 
 

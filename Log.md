@@ -1,5 +1,11 @@
 # Logs
 
+## [v1.3.2] Invisible | 2025/11/11
+
+Added `Invisible`:
+- A simple way to make parts invisible to clients.
+- Note: this sets `LocalTransparencyModifier` to 1 on all descendant parts.
+
 ## [v1.3.1] Minor changes | 2025/11/11
 
 Prefixed "[Load Lighting]" to `LoadLighting`'s debug print.
