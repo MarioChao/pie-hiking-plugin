@@ -1,5 +1,26 @@
 # Logs
 
+## [v1.3.3] Improved map & music + Client lighting | 2025/12/12
+
+Improved map system:
+- Dream folders can now be recognized by adding the "DreamFolder" tag.
+  - You can now either add the "DreamFolder" tag or set the "DreamDifficulty" attribute.
+- New dream folder attribute `AutoUnload`:
+  - When enabled, the dream folder will unload (stored in `ServerStorage`) if it's not the default folder.
+  - When disabled, the dream folder will remain in `workspace`.
+
+Improved music system:
+- Music zones:
+  - The `AssetId` attribute now accepts either `number` or `string`.
+  - New attribute `FromSound` - when enabled, audio info is from a child `Sound` instance under the `MusicZone` folder.
+- Default music:
+  - The plugin will set up a `Sound` under `PieMapKit_SharedStorage` called `Custom_DefaultMusicSound`.
+    - This instance won't be replaced by the plugin, meaning you can now refresh the map kit without having to modify the default music.
+
+Added support for modifying lighting on the client side (in the `UpdateLighting` module).
+- By passing a `Player` as the second parameter to `applyLightingConfig`, the `Lighting` will only be changed for that specific `Player`.
+- This will be useful for `LightingChangers` in the future.
+
 ## [v1.3.2] Invisible | 2025/11/11
 
 Added `Invisible`:

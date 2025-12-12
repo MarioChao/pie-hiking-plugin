@@ -37,19 +37,27 @@ local LoadDreamBindable = PieMapKitEvents.LoadDreamBindable
 local LoadDreamRemote = PieMapKitEvents.LoadDreamRemote
 local LightingBindable = PieMapKitEvents.LightingBindable
 
-local DefaultDreamValue: ObjectValue = workspace:FindFirstChild("_DefaultDreamValue", true)
-local DefaultDream = DefaultDreamValue.Value
+local DefaultDreamValue: ObjectValue? = workspace:FindFirstChild("_DefaultDreamValue", true)
+local DefaultDream = DefaultDreamValue and DefaultDreamValue.Value
 
 local DreamStorage = ServerStorage:FindFirstChild("DreamStorage") or Instance.new("Folder")
 DreamStorage.Name = "DreamStorage"
 DreamStorage.Parent = ServerStorage
 
 
+---------- Constants ----------
+
+local Constants = {}
+Constants.dreamFolderTagName = "DreamFolder"
+Constants.mapTagName = "HikeMap"
+Constants.autoUnloadAttributeName = "AutoUnload"
+
+table.freeze(Constants)
+
+
 ---------- Variables ----------
 
-local mapTagName = "HikeMap"
-
-local savedMapFolder: {[Instance]: Folder} = {}
+local savedMapFolder: {[Instance]: Instance} = {}
 
 local activeClientDreamMapFolder: {[Instance]: Instance} = {}
 
@@ -57,9 +65,16 @@ local activeClientDreamMapFolder: {[Instance]: Instance} = {}
 ---------- Local functions ----------
 -- Define general functions here
 
-local function getMapFolder(dreamFolder: Instance)
+
+----- Dreams -----
+
+local function getIsDreamFolder(object: Instance): boolean
+	return object and (object:HasTag(Constants.dreamFolderTagName) or object:GetAttribute("DreamDifficulty") ~= nil)
+end
+
+local function getMapFolder(dreamFolder: Instance): Instance?
 	for _, object in dreamFolder:GetChildren() do
-		if object:HasTag(mapTagName) then
+		if object:HasTag(Constants.mapTagName) then
 			return object
 		end
 	end
@@ -106,7 +121,7 @@ local function unloadDream(dreamFolder: Instance)
 end
 
 
----------- Event functions ----------
+----- Event functions -----
 -- Functions that are directly connected by events or signals
 
 local function onPlayerAdded(player: Player)
@@ -133,7 +148,7 @@ end
 
 local function onDreamAddedEvent(dreamFolder: Folder)
 	-- Validate dream
-	if not (dreamFolder and dreamFolder:GetAttribute("DreamDifficulty")) then
+	if not getIsDreamFolder(dreamFolder) then
 		return
 	end
 
@@ -141,7 +156,11 @@ local function onDreamAddedEvent(dreamFolder: Folder)
 	if dreamFolder == DefaultDream then
 		loadDream(dreamFolder)
 	else
-		unloadDream(dreamFolder)
+		if dreamFolder:GetAttribute(Constants.autoUnloadAttributeName) then
+			unloadDream(dreamFolder)
+		else
+			loadDream(dreamFolder)
+		end
 	end
 end
 
@@ -154,7 +173,7 @@ local function onLoadDreamBindableEvent(action: string, ...)
 end
 
 
----------- Set up function ----------
+----- Set up function -----
 local function initSetUp()
 	-- Dream maps
 	local dreams = DreamMaps.getAllDreams()

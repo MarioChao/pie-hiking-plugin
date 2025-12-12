@@ -1,4 +1,5 @@
 --!strict
+
 -- Types Module
 
 
@@ -39,4 +40,5 @@ export type LightingConfigType = {
 
 
 ---------- Return module ----------
+
 return 1

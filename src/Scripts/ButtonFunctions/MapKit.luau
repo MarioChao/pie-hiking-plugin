@@ -35,6 +35,23 @@ local function removeDupes(parent: Instance, childName: string)
 	end
 end
 
+local function replaceIfNotFound(parent: Instance, child: Instance): Instance?
+	local addedInstance = nil
+	if not parent:FindFirstChild(child.Name) then
+		local newObject = child:Clone()
+		newObject.Parent = parent
+		addedInstance = newObject
+	end
+	return addedInstance
+end
+
+local function replaceWithNew(parent: Instance, child: Instance)
+	removeDupes(parent, child.Name)
+	local newObject = child:Clone()
+	newObject.Parent = parent
+	return newObject
+end
+
 local function enableDescendantScripts(parent: Instance)
 	for _, object in parent:GetDescendants() do
 		-- Validate script
@@ -57,11 +74,30 @@ local function setUpMapKitContainers(): {Instance}
 	local addedInstances = {}
 
 	for _, object in KitGameInstances.ReplicatedStorage:GetChildren() do
-		removeDupes(ReplicatedStorage, object.Name)
-		local newObject = object:Clone()
-		enableDescendantScripts(newObject)
-		newObject.Parent = ReplicatedStorage
-		table.insert(addedInstances, newObject)
+		if object.Name == "PieMapKit_SharedStorage" then
+			local newParentObject = replaceIfNotFound(ReplicatedStorage, object)
+			if newParentObject then
+				enableDescendantScripts(newParentObject)
+				table.insert(addedInstances, newParentObject)
+			end
+			for _, object_2 in object:GetChildren() do
+				if string.find(object_2.Name, "Custom_", 0, true) then
+					local newReplaced = replaceIfNotFound(ReplicatedStorage[object.Name], object_2)
+					if newReplaced then
+						enableDescendantScripts(newReplaced)
+						table.insert(addedInstances, newReplaced)
+					end
+				else
+					local newObject = replaceWithNew(ReplicatedStorage[object.Name], object_2)
+					enableDescendantScripts(newObject)
+					table.insert(addedInstances, newObject)
+				end
+			end
+		else
+			local newObject = replaceWithNew(ReplicatedStorage, object)
+			enableDescendantScripts(newObject)
+			table.insert(addedInstances, newObject)
+		end
 	end
 	for _, object in KitGameInstances.ServerScriptService:GetChildren() do
 		removeDupes(ServerScriptService, object.Name)

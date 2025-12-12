@@ -1,0 +1,9 @@
+{
+    "properties": {
+        "RunContext": "Client",
+        "Disabled": true,
+		"Attributes": {
+			"Enabled": {"Bool": true}
+		}
+    }
+}

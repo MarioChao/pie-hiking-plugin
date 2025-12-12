@@ -27,7 +27,7 @@ local PieMapKit_Audio = SoundService:WaitForChild("PieMapKit_Audio")
 ---------- Types ----------
 
 type AudioInfo = {
-	AssetId: number,
+	AssetId: number | string,
 	LoopRegion: NumberRange,
 	PlaybackRegion: NumberRange,
 	PlaybackSpeed: number,
@@ -44,23 +44,38 @@ type AudioPlayingState = "FadeOut" | "FadeIn" | "Playing"
 
 ---------- Instances ----------
 
-local PieMapKitEvents = PieMapKit_SharedStorage.PieMapKitEvents
-local MusicBindable = PieMapKitEvents.MusicBindable
+local PieMapKitEvents = PieMapKit_SharedStorage:WaitForChild("PieMapKitEvents")
+local MusicBindable = PieMapKitEvents:WaitForChild("MusicBindable")
 
-local AudioPlayer = PieMapKit_Audio.AudioPlayer
+local AudioPlayer = PieMapKit_Audio:WaitForChild("AudioPlayer")
 
 
 ---------- Variables ----------
 
 local timeFunction = time
 
-local defaultAudio: AudioInfo = {
-	AssetId = 9045766377,
-	LoopRegion = NumberRange.new(3.8, 72),
-	PlaybackRegion = NumberRange.new(0),
-	PlaybackSpeed = 0.8,
-	Volume = 0.5,
-}
+local defaultAudio: AudioInfo = (function()
+	local customSound = PieMapKit_SharedStorage:FindFirstChild("Custom_DefaultMusicSound") :: Instance
+	local result: AudioInfo
+	if customSound and customSound:IsA("Sound") then
+		result = {
+			AssetId = customSound.SoundId,
+			LoopRegion = customSound.PlaybackRegionsEnabled and customSound.LoopRegion or NumberRange.new(0),
+			PlaybackRegion = customSound.PlaybackRegionsEnabled and customSound.PlaybackRegion or NumberRange.new(0),
+			PlaybackSpeed = customSound.PlaybackSpeed,
+			Volume = customSound.Volume,
+		}
+	else
+		result = {
+			AssetId = 9045766377,
+			LoopRegion = NumberRange.new(3.8, 72),
+			PlaybackRegion = NumberRange.new(0),
+			PlaybackSpeed = 0.8,
+			Volume = 0.5,
+		}
+	end
+	return result
+end)()
 
 local fadeTime = 1
 
@@ -106,7 +121,12 @@ end
 
 local function setPlayedAudio(audioInfo: AudioInfo)
 	-- Get audio asset string
-	local audioAsset = `rbxassetid://{audioInfo.AssetId}`
+	local audioAsset
+	if tonumber(audioInfo.AssetId) then
+		audioAsset = `rbxassetid://{audioInfo.AssetId}`
+	else
+		audioAsset = tostring(audioInfo.AssetId)
+	end
 
 	-- Check if different audio asset
 	if AudioPlayer.Asset ~= audioAsset then
@@ -146,7 +166,12 @@ local function setTargetAudio(audioInfo: AudioInfo)
 	targetAudio = audioInfo
 
 	-- If same asset, play directly (with fade in)
-	local audioAsset = `rbxassetid://{audioInfo.AssetId}`
+	local audioAsset
+	if tonumber(audioInfo.AssetId) then
+		audioAsset = `rbxassetid://{audioInfo.AssetId}`
+	else
+		audioAsset = tostring(audioInfo.AssetId)
+	end
 	if AudioPlayer.Asset == audioAsset then
 		setPlayedAudio(targetAudio)
 		return

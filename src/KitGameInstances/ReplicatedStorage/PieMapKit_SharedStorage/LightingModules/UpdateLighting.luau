@@ -1,15 +1,14 @@
 --!strict
+
 -- Update Lighting Module
-
-
----------- Module ----------
-local UpdateLightingModule = {}
 
 
 ---------- Services ----------
 
 local Debris = game:GetService("Debris")
 local Lighting = game:GetService("Lighting")
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 
 
 ---------- Imports ----------
@@ -25,9 +24,39 @@ type LightingProperties = LightingTypes.LightingProperties
 type PostEffectTypes = LightingTypes.PostEffectTypes
 
 
+---------- Constants ----------
+
+local Constants = {}
+Constants.lightingRemoteEvent = script.Parent:WaitForChild("LightingRemoteEvent")
+Constants.remoteEventStrings = {
+    server = {
+        playerConnected = "Player Connected",
+    },
+    client = {
+        updateLighting = "Update Lighting",
+    },
+}
+
+table.freeze(Constants)
+
+
+---------- Globals ----------
+
+local Globals = {}
+Globals.playerConnected = {} :: {[Player]: boolean}
+
+
 ---------- Local functions ----------
 
-local function updateAtmosphere(atmosphere: Atmosphere?)
+local updateAtmosphere
+local updateLightingProperties
+local updatePostEffects
+local updateSky
+
+
+----- Update lighting -----
+
+updateAtmosphere = function(atmosphere: Atmosphere?)
 	-- Validate atmosphere
 	if not atmosphere then
 		return
@@ -45,7 +74,7 @@ local function updateAtmosphere(atmosphere: Atmosphere?)
 	newAtmosphere.Parent = Lighting
 end
 
-local function updateLightingProperties(lightingProperties: LightingProperties?)
+updateLightingProperties = function(lightingProperties: LightingProperties?)
 	-- Validate lighting properties
 	if not lightingProperties then
 		return
@@ -58,11 +87,11 @@ local function updateLightingProperties(lightingProperties: LightingProperties?)
 		end
 	end)
 	if not success then
-		warn("Update lighting error:", result)
+		warn("[Update Lighting]: Update lighting error:", result)
 	end
 end
 
-local function updatePostEffects(postProcessing: PostEffectTypes?)
+updatePostEffects = function(postProcessing: PostEffectTypes?)
 	-- Validate post effects
 	if not postProcessing then
 		return
@@ -90,7 +119,7 @@ local function updatePostEffects(postProcessing: PostEffectTypes?)
 	end
 end
 
-local function updateSky(sky: Sky?)
+updateSky = function(sky: Sky?)
 	-- Validate sky
 	if not sky then
 		return
@@ -109,19 +138,58 @@ local function updateSky(sky: Sky?)
 end
 
 
----------- Module functions ----------
-function UpdateLightingModule.applyLightingConfig(lightingConfig: LightingConfigType?)
+----- Main -----
+
+local function main()
+	if RunService:IsServer() then
+		Constants.lightingRemoteEvent.OnServerEvent:Connect(function(player: Player, mode: string)
+			if mode == Constants.remoteEventStrings.server.playerConnected then
+				Globals.playerConnected[player] = true
+			end
+		end)
+		Players.PlayerRemoving:Connect(function(player: Player)
+			Globals.playerConnected[player] = nil
+		end)
+	end
+end
+
+
+---------- Calling function ----------
+
+task.defer(main)
+
+
+---------- Module ----------
+
+local UpdateLightingModule = {}
+
+
+----- Module fields -----
+
+function UpdateLightingModule.applyLightingConfig(lightingConfig: LightingConfigType?, specificPlayer: Player?)
 	if not lightingConfig then
 		return
 	end
-
-	updateAtmosphere(lightingConfig.Atmosphere)
-	updateLightingProperties(lightingConfig.Lighting)
-	updatePostEffects(lightingConfig.PostProcessing)
-	updateSky(lightingConfig.Sky)
-
+	if specificPlayer and RunService:IsServer() then
+		task.defer(function()
+			local startTime = time()
+			while not Globals.playerConnected[specificPlayer] and time() - startTime < 5 do
+				task.wait()
+			end
+			if Globals.playerConnected[specificPlayer] then
+				Constants.lightingRemoteEvent:FireClient(specificPlayer, Constants.remoteEventStrings.client.updateLighting, lightingConfig)
+			end
+		end)
+	else
+		updateAtmosphere(lightingConfig.Atmosphere)
+		updateLightingProperties(lightingConfig.Lighting)
+		updatePostEffects(lightingConfig.PostProcessing)
+		updateSky(lightingConfig.Sky)
+	end
 end
 
 
 ---------- Return module ----------
+
+table.freeze(UpdateLightingModule)
 return UpdateLightingModule
