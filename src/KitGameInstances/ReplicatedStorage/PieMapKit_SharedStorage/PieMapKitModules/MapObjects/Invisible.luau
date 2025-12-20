@@ -8,40 +8,51 @@
 local RunService = game:GetService("RunService")
 
 
+---------- Imports ----------
+
+local PieMapKit_SharedStorage = script.Parent.Parent.Parent
+local _OtherModules = PieMapKit_SharedStorage:WaitForChild("OtherModules")
+local UIUtil = require(_OtherModules:WaitForChild("UIUtil"))
+
+
 ---------- Types ----------
 
 type ObjectConnections = {[Instance]: {RBXScriptConnection}}
 
 
----------- Variables ----------
+---------- Globals ----------
 
-local taggedContainerConnections: {[Instance]: ObjectConnections} = {}
+local Globals = {}
+Globals.taggedContainer_object_connections = {} :: {[Instance]: ObjectConnections}
 
 
 ---------- Local functions ----------
 
+local setUpChildObject
+local onChildObjectAdded
+local cleanUpChildObject
+local setUpObjectContainer
+local cleanUpObjectContainer
+local validateObject
+
+
 ----- Container functions -----
 
-local function setUpChildObject(container: Instance, part: BasePart)
+setUpChildObject = function(container: Instance, object: Instance)
 	-- Get container connections
-	local objectConnections = taggedContainerConnections[container]
+	local objectConnections = Globals.taggedContainer_object_connections[container]
 
 	-- Set up connections
 	local connections = {}
-	objectConnections[part] = connections
+	objectConnections[object] = connections
 
-	-- Make part invisible
-    part.LocalTransparencyModifier = 1
+	-- Make object & descendants invisible
+	UIUtil.setTransparency(object, 1)
 end
 
-local function onChildObjectAdded(container: Instance, child: Instance)
-	-- Validate child
-	if not child:IsA("BasePart") then
-		return
-	end
-
+onChildObjectAdded = function(container: Instance, child: Instance)
 	-- Get container connections
-	local objectConnections = taggedContainerConnections[container]
+	local objectConnections = Globals.taggedContainer_object_connections[container]
 
 	-- Validate unique
 	if objectConnections[child] then
@@ -52,9 +63,9 @@ local function onChildObjectAdded(container: Instance, child: Instance)
 	setUpChildObject(container, child)
 end
 
-local function cleanUpChildObject(container: Instance, child: Instance)
+cleanUpChildObject = function(container: Instance, child: Instance)
 	-- Get container connections
-	local objectConnections = taggedContainerConnections[container]
+	local objectConnections = Globals.taggedContainer_object_connections[container]
 
 	-- Disconnect and remove stored connections
 	for _, connection in objectConnections[child] do
@@ -63,7 +74,7 @@ local function cleanUpChildObject(container: Instance, child: Instance)
 	objectConnections[child] = nil
 end
 
-local function setUpObjectContainer(container: Instance)
+setUpObjectContainer = function(container: Instance)
 	-- Validate client
 	if not RunService:IsClient() then
 		return
@@ -71,16 +82,14 @@ local function setUpObjectContainer(container: Instance)
 
 	-- Set up connections
 	local objectConnections: ObjectConnections = {}
-	taggedContainerConnections[container] = objectConnections
+	Globals.taggedContainer_object_connections[container] = objectConnections
 
 	if not objectConnections[container] then
 		objectConnections[container] = {}
 	end
 
 	-- Set up container
-	if container:IsA("BasePart") then
-		setUpChildObject(container, container)
-	end
+	setUpChildObject(container, container)
 
 	-- Set up container descendants
     do
@@ -99,20 +108,20 @@ local function setUpObjectContainer(container: Instance)
 	end
 end
 
-local function cleanUpObjectContainer(container: Instance)
+cleanUpObjectContainer = function(container: Instance)
 	-- Disconnect and remove stored connections
-	if taggedContainerConnections[container] then
-		for object, connections in taggedContainerConnections[container] do
+	if Globals.taggedContainer_object_connections[container] then
+		for object, connections in Globals.taggedContainer_object_connections[container] do
 			for _, connection in connections do
 				connection:Disconnect()
 			end
-			taggedContainerConnections[container][object] = nil
+			Globals.taggedContainer_object_connections[container][object] = nil
 		end
-		taggedContainerConnections[container] = nil
+		Globals.taggedContainer_object_connections[container] = nil
 	end
 end
 
-local function validateObject(object: Instance)
+validateObject = function(object: Instance)
 	return object:IsA("Instance")
 end
 
@@ -131,7 +140,7 @@ function Module.addInstance(object: Instance)
 	end
 
 	-- Validate unique
-	if taggedContainerConnections[object] then
+	if Globals.taggedContainer_object_connections [object] then
 		return
 	end
 

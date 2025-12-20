@@ -1,5 +1,16 @@
 # Logs
 
+TODO:
+- Simplify code for activators (ex: touch, zone).
+
+## [v1.3.5] Lighting zones + UIUtil invisible + Small fixes | 2025/12/20
+
+Added `LightingZones`, client-sided zones that change the lighting according to a child "LightingConfig" `ModuleScript`.
+
+`Invisible` tag now hides more variety of instances as well (ex: GUIs, decals) using `UIUtil`.
+
+Default post effects no longer tween from `Instance.new()` values for initial lighting update.
+
 ## [v1.3.4] Tweened lighting effects | 2025/12/19
 
 Lighting effects are now tweened when possible.

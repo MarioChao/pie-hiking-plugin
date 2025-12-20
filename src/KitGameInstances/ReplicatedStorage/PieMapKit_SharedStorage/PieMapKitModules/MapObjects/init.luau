@@ -1,9 +1,6 @@
 --!strict
+
 -- Map Objects Module
-
-
----------- Module ----------
-local MapObjects = {}
 
 
 ---------- Services ----------
@@ -19,6 +16,7 @@ local HikeCheckpoints = require(script.HikeCheckpoints)
 local Invisible = require(script.Invisible)
 local PositionTeleporters = require(script.PositionTeleporters)
 local MusicZones = require(script.MusicZones)
+local LightingZones = require(script.LightingZones)
 
 
 ---------- Types ----------
@@ -38,6 +36,7 @@ local objectTagNames: {[string]: ObjectModule} = {
 	["PositionTeleporter"] = PositionTeleporters,
 	["MusicZone"] = MusicZones,
 	["Invisible"] = Invisible,
+	["LightingZone"] = LightingZones,
 }
 
 
@@ -58,6 +57,7 @@ end
 
 
 ---------- Set up function ----------
+
 local function initSetUp()
 	setUpTags()
 end
@@ -69,4 +69,5 @@ initSetUp()
 
 
 ---------- Return module ----------
+
 return 1

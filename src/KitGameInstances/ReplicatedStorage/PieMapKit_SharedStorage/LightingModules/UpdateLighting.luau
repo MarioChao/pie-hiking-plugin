@@ -110,7 +110,11 @@ getOrRenameOrCreateChildInstance = function(parent: Instance, name: string, clas
 			result = foundChild
 			result.Name = name
 		else
-			result = Instance.new(className)
+			if Constants.default_postEffectClassName_instance[className] then
+				result = Constants.default_postEffectClassName_instance[className]:Clone()
+			else
+				result = Instance.new(className)
+			end
 			result.Parent = parent
 			task.delay(1, function()
 				result.Name = name

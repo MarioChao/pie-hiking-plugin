@@ -1,6 +1,6 @@
 --!strict
 
--- Music Zones Module
+-- Lighting Zones Module
 
 
 ---------- Services ----------
@@ -12,21 +12,20 @@ local RunService = game:GetService("RunService")
 ---------- Imports ----------
 
 local PieMapKit_SharedStorage = script.Parent.Parent.Parent
+
 local _OtherModules = PieMapKit_SharedStorage:WaitForChild("OtherModules")
 local SpatialQuery = require(_OtherModules:WaitForChild("SpatialQuery"))
+
+local _LightingModules = PieMapKit_SharedStorage:WaitForChild("LightingModules")
+local UpdateLighting = require(_LightingModules:WaitForChild("UpdateLighting"))
+local LightingTypes = require(_LightingModules:WaitForChild("Types"))
 
 
 ---------- Types ----------
 
 type ObjectConnections = {[Instance]: {RBXScriptConnection}}
 
-type AudioInfo = {
-	AssetId: number | string,
-	LoopRegion: NumberRange,
-	PlaybackRegion: NumberRange,
-	PlaybackSpeed: number,
-	Volume: number,
-}
+type LightingConfig = LightingTypes.LightingConfigType
 
 
 ---------- Constants ----------
@@ -40,9 +39,6 @@ if RunService:IsClient() then
 	Constants.localPlayer = Players.LocalPlayer or Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
 end
 
-Constants.pieMapKitEvents = PieMapKit_SharedStorage:WaitForChild("PieMapKitEvents")
-Constants.musicBindable = Constants.pieMapKitEvents:WaitForChild("MusicBindable")
-
 table.freeze(Constants)
 
 
@@ -53,17 +49,17 @@ local Globals = {}
 -- Although no connections are made, this table is still used for accessing container instances
 Globals.taggedContainerConnections = {} :: {[Instance]: ObjectConnections}
 
-Globals.previousAudio = nil :: AudioInfo?
+Globals.previousLightingConfig = nil :: LightingConfig?
 
 
 ---------- Local functions ----------
 
 local createDefault
 local getPlayerParts
-local isSameAudio
+local isSameLightingConfig
 
-local getAudioInfo
-local playContainerMusic
+local getLightingConfig
+local updateContainerLighting
 
 local isPlayerInZone
 local checkZonesLoopFrame
@@ -96,18 +92,18 @@ getPlayerParts = function(player: Player)
 	return result
 end
 
-isSameAudio = function(audio1: AudioInfo?, audio2: AudioInfo?)
-	if not audio1 or not audio2 then
+isSameLightingConfig = function(config1: LightingConfig?, config2: LightingConfig?)
+	if not config1 or not config2 then
 		return false
 	end
 
-	for key, value in audio1 do
-		if audio2[key] ~= value then
+	for key, value in config1 do
+		if config2[key] ~= value then
 			return false
 		end
 	end
-	for key, value in audio2 do
-		if audio1[key] ~= value then
+	for key, value in config2 do
+		if config1[key] ~= value then
 			return false
 		end
 	end
@@ -116,50 +112,35 @@ isSameAudio = function(audio1: AudioInfo?, audio2: AudioInfo?)
 end
 
 
------ Music functions -----
+----- Lighting functions -----
 
-getAudioInfo = function(container: Instance): AudioInfo
+getLightingConfig = function(container: Instance): LightingConfig
 	local result
-	if container:GetAttribute("FromSound") then
-		local sound = container:FindFirstChildWhichIsA("Sound")
-		if sound then
-			result = {
-				AssetId = sound.SoundId,
-				LoopRegion = sound.PlaybackRegionsEnabled and sound.LoopRegion or NumberRange.new(0),
-				PlaybackRegion = sound.PlaybackRegionsEnabled and sound.PlaybackRegion or NumberRange.new(0),
-				PlaybackSpeed = sound.PlaybackSpeed,
-				Volume = sound.Volume,
-			}
-		else
-			warn(`[Music Zones]: No sound instance found for "{container}!"`)
+	result = {}
+	for _, child in container:GetChildren() do
+		if child.Name == "LightingConfig" and child:IsA("ModuleScript") then
+			result = require(child) :: LightingConfig
+			break
 		end
-	else
-		result = {
-			AssetId = tostring(container:GetAttribute("Audio_AssetId")) :: string,
-			LoopRegion = container:GetAttribute("Audio_LoopRegion") :: NumberRange,
-			PlaybackRegion = container:GetAttribute("Audio_PlaybackRegion") :: NumberRange,
-			PlaybackSpeed = container:GetAttribute("Audio_PlaybackSpeed") :: number,
-			Volume = container:GetAttribute("Audio_Volume") :: number,
-		}
 	end
 	return result
 end
 
 
--- Play music
+-- Update lighting
 
-playContainerMusic = function(container: Instance)
-	-- Get music info
-	local audioInfo: AudioInfo = getAudioInfo(container)
+updateContainerLighting = function(container: Instance)
+	-- Get lighting config
+	local lightingConfig = getLightingConfig(container)
 
-	-- Validate different music
-	if isSameAudio(Globals.previousAudio, audioInfo) then
+	-- Validate different lighting
+	if isSameLightingConfig(Globals.previousLightingConfig, lightingConfig) then
 		return
 	end
 
-	-- Set music
-	Globals.previousAudio = audioInfo
-	Constants.musicBindable:Fire("SetAudio", audioInfo)
+	-- Set lighting
+	Globals.previousLightingConfig = lightingConfig
+	UpdateLighting.applyLightingConfig(lightingConfig)
 end
 
 
@@ -219,14 +200,6 @@ checkZonesLoopFrame = function()
 
 	-- Check if player not in any zone
 	if not highestPriority then
-		-- Validate different music
-		if not Globals.previousAudio then
-			return
-		end
-
-		-- Play default audio
-		Globals.previousAudio = nil
-		Constants.musicBindable:Fire("PlayDefaultAudio")
 		return
 	end
 
@@ -234,13 +207,12 @@ checkZonesLoopFrame = function()
 	local filteredContainers = priorityContainers[highestPriority]
 	local selectedContainer = filteredContainers[Constants.randomGenerator:NextInteger(1, #filteredContainers)]
 
-	-- Play container music
-	playContainerMusic(selectedContainer)
+	-- Update lighting
+	updateContainerLighting(selectedContainer)
 end
 
 
 ----- Container set up -----
-
 
 -- The container
 
