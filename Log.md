@@ -1,5 +1,11 @@
 # Logs
 
+## [v1.3.4] Tweened lighting effects | 2025/12/19
+
+Lighting effects are now tweened when possible.
+
+Unspecified lighting effects will now be reverted to the default state.
+
 ## [v1.3.3] Improved map & music + Client lighting | 2025/12/12
 
 Improved map system:

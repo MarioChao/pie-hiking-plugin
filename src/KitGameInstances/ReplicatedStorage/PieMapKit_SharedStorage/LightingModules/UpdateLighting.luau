@@ -5,7 +5,6 @@
 
 ---------- Services ----------
 
-local Debris = game:GetService("Debris")
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
@@ -14,14 +13,16 @@ local RunService = game:GetService("RunService")
 ---------- Imports ----------
 
 local LightingModules = script.Parent
-local LightingTypes = require(LightingModules.Types)
+local LightingTypes = require(LightingModules:WaitForChild("Types"))
+
+local _OtherModules = LightingModules.Parent:WaitForChild("OtherModules")
+local InstanceTween = require(_OtherModules:WaitForChild("InstanceTween"))
 
 
 ---------- Types ----------
 
 type LightingConfigType = LightingTypes.LightingConfigType
 type LightingProperties = LightingTypes.LightingProperties
-type PostEffectTypes = LightingTypes.PostEffectTypes
 
 
 ---------- Constants ----------
@@ -36,6 +37,45 @@ Constants.remoteEventStrings = {
         updateLighting = "Update Lighting",
     },
 }
+table.freeze(Constants.remoteEventStrings)
+
+Constants.defaultLightingProperties = {
+	Ambient = Color3.fromRGB(70, 70, 70),
+	Brightness = 3,
+	ClockTime = 14.5,
+	ColorShift_Bottom = Color3.fromRGB(0, 0, 0),
+	ColorShift_Top = Color3.fromRGB(0, 0, 0),
+	EnvironmentDiffuseScale = 1,
+	EnvironmentSpecularScale = 1,
+	ExposureCompensation = 0,
+	GlobalShadows = true,
+	OutdoorAmbient = Color3.fromRGB(70, 70, 70),
+	ShadowSoftness = 0.2,
+	TimeOfDay = "14:30:00",
+} :: LightingProperties
+table.freeze(Constants.defaultLightingProperties)
+
+Constants.postEffectClassNames = {
+	"BloomEffect",
+	"BlurEffect",
+	"ColorCorrectionEffect",
+	"ColorGradingEffect",
+	"DepthOfFieldEffect",
+	"SunRaysEffect",
+}
+table.freeze(Constants.postEffectClassNames)
+
+Constants.default_postEffectClassName_instance = {
+	BloomEffect = Instance.new("BloomEffect"),
+	BlurEffect = Instance.new("BlurEffect"),
+}
+Constants.default_postEffectClassName_instance.BloomEffect.Intensity = 0
+Constants.default_postEffectClassName_instance.BlurEffect.Size = 0
+table.freeze(Constants.default_postEffectClassName_instance)
+
+Constants.prefix = "UpdateLighting_"
+
+Constants.defaultTweenInfo = TweenInfo.new(1)
 
 table.freeze(Constants)
 
@@ -48,93 +88,113 @@ Globals.playerConnected = {} :: {[Player]: boolean}
 
 ---------- Local functions ----------
 
+local getOrRenameOrCreateChildInstance
+local getClockTimeFromTimeOfDay
 local updateAtmosphere
 local updateLightingProperties
 local updatePostEffects
 local updateSky
 
 
+----- Get or create -----
+
+getOrRenameOrCreateChildInstance = function(parent: Instance, name: string, className: string)
+	local foundChild
+	local result
+	foundChild = parent:FindFirstChild(name)
+	if foundChild and foundChild:IsA(className) then
+		result = foundChild
+	else
+		foundChild = parent:FindFirstChildWhichIsA(className)
+		if foundChild then
+			result = foundChild
+			result.Name = name
+		else
+			result = Instance.new(className)
+			result.Parent = parent
+			task.delay(1, function()
+				result.Name = name
+			end)
+		end
+	end
+	return result
+end
+
+
+----- Get clock time -----
+
+getClockTimeFromTimeOfDay = function(timeOfDay: string)
+	local hours_str, minutes_str, seconds_str = string.match(timeOfDay, "(%d+):(%d+):(%d+)")
+	local hours = tonumber(hours_str) or 0
+	local minutes = tonumber(minutes_str) or 0
+	local seconds = tonumber(seconds_str) or 0
+	return hours + (minutes + seconds / 60) / 60
+end
+
+
 ----- Update lighting -----
 
-updateAtmosphere = function(atmosphere: Atmosphere?)
-	-- Validate atmosphere
-	if not atmosphere then
-		return
+updateAtmosphere = function(atmosphere: Atmosphere?, tweenInfo: TweenInfo)
+	local rootAtmosphere
+	local propertyTable
+	rootAtmosphere = getOrRenameOrCreateChildInstance(Lighting, Constants.prefix .. "Atmosphere", "Atmosphere") :: Atmosphere
+	if atmosphere then
+		propertyTable = InstanceTween.getWritablePropertyTableFromInstance(atmosphere)
+	else
+		propertyTable = {}
 	end
-
-	-- Remove old atmosphere
-	for _, object in Lighting:GetChildren() do
-		if object:IsA("Atmosphere") then
-			Debris:AddItem(object, 0)
-		end
-	end
-
-	-- Clone new atmosphere
-	local newAtmosphere = atmosphere:Clone()
-	newAtmosphere.Parent = Lighting
+	InstanceTween.tweenOrSetProperties(rootAtmosphere, propertyTable, {}, {}, tweenInfo, false)
 end
 
-updateLightingProperties = function(lightingProperties: LightingProperties?)
-	-- Validate lighting properties
-	if not lightingProperties then
-		return
+updateLightingProperties = function(lightingProperties: LightingProperties?, tweenInfo: TweenInfo)
+	local propertyTable = lightingProperties or table.clone(Constants.defaultLightingProperties)
+	if propertyTable.TimeOfDay then
+		propertyTable["ClockTime"] = getClockTimeFromTimeOfDay(propertyTable.TimeOfDay)
+		propertyTable["TimeOfDay"] = nil
 	end
-
-	-- Update lighting properties
-	local success, result = pcall(function()
-		for property, value in lightingProperties do
-			Lighting[property] = value
-		end
-	end)
-	if not success then
-		warn("[Update Lighting]: Update lighting error:", result)
-	end
+	InstanceTween.tweenOrSetProperties(Lighting, propertyTable, Constants.defaultLightingProperties, {"TimeOfDay"}, tweenInfo, false)
 end
 
-updatePostEffects = function(postProcessing: PostEffectTypes?)
-	-- Validate post effects
-	if not postProcessing then
-		return
-	end
+updatePostEffects = function(postProcessing: {PostEffect}?, tweenInfo: TweenInfo)
+	local className_postEffect = {} :: {[string]: PostEffect}
+	local effectInstance
+	local propertyTable
 
-	-- Go through post effects
-	for _, effect in postProcessing do
-		-- Validate effect
-		if not effect then
-			continue
-		end
-
-		-- Clone new effect
-		local newEffect = (effect :: PostEffect):Clone()
-
-		-- Remove old effects
-		for _, object in Lighting:GetChildren() do
-			if object:IsA(newEffect.Name) then
-				Debris:AddItem(object, 0)
+	-- Get post effects dictionary
+	if postProcessing then
+		for _, postEffect in postProcessing do
+			if className_postEffect[postEffect.ClassName] then
+				warn(`[Update Lighting]: Duplicate {postEffect.ClassName} found!`)
+			else
+				className_postEffect[postEffect.ClassName] = postEffect
 			end
 		end
+	end
 
-		-- Parent new effect
-		newEffect.Parent = Lighting
+	-- Go through post effect classes
+	for _, className in Constants.postEffectClassNames do
+		effectInstance = getOrRenameOrCreateChildInstance(Lighting, Constants.prefix .. className, className) :: PostEffect
+		if className_postEffect[className] then
+			propertyTable = InstanceTween.getWritablePropertyTableFromInstance(className_postEffect[className])
+		elseif Constants.default_postEffectClassName_instance[className] then
+			propertyTable = Constants.default_postEffectClassName_instance[className]
+		else
+			propertyTable = {}
+		end
+		InstanceTween.tweenOrSetProperties(effectInstance, propertyTable, {}, {}, tweenInfo, false)
 	end
 end
 
-updateSky = function(sky: Sky?)
-	-- Validate sky
-	if not sky then
-		return
+updateSky = function(sky: Sky?, tweenInfo: TweenInfo)
+	local rootSky
+	local propertyTable
+	rootSky = getOrRenameOrCreateChildInstance(Lighting, Constants.prefix .. "Sky", "Sky") :: Sky
+	if sky then
+		propertyTable = InstanceTween.getWritablePropertyTableFromInstance(sky)
+	else
+		propertyTable = {}
 	end
-
-	-- Remove old sky
-	for _, object in Lighting:GetChildren() do
-		if object:IsA("Sky") then
-			Debris:AddItem(object, 0)
-		end
-	end
-
-	-- Clone new sky
-	local newSky = sky:Clone()
-	newSky.Parent = Lighting
+	InstanceTween.tweenOrSetProperties(rootSky, propertyTable, {}, {}, tweenInfo, false)
 end
 
 
@@ -181,10 +241,16 @@ function UpdateLightingModule.applyLightingConfig(lightingConfig: LightingConfig
 			end
 		end)
 	else
-		updateAtmosphere(lightingConfig.Atmosphere)
-		updateLightingProperties(lightingConfig.Lighting)
-		updatePostEffects(lightingConfig.PostProcessing)
-		updateSky(lightingConfig.Sky)
+		local tweenInfo
+		if lightingConfig.tweenDuration then
+			tweenInfo = TweenInfo.new(lightingConfig.tweenDuration)
+		else
+			tweenInfo = Constants.defaultTweenInfo
+		end
+		updateAtmosphere(lightingConfig.Atmosphere, tweenInfo)
+		updateLightingProperties(lightingConfig.Lighting, tweenInfo)
+		updatePostEffects(lightingConfig.PostProcessing, tweenInfo)
+		updateSky(lightingConfig.Sky, tweenInfo)
 	end
 end
 

@@ -21,6 +21,7 @@ Constants.remoteEventStrings = {
         updateLighting = "Update Lighting",
     },
 }
+table.freeze(Constants.remoteEventStrings)
 
 table.freeze(Constants)
 

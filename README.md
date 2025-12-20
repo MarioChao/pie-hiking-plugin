@@ -19,7 +19,8 @@ You can also share and submit maps in the [Discord server](https://discord.gg/ym
 - [Rojo](https://rojo.space/)
 - [Wally](https://wally.run/)
 
-## Plan
+## Issues
 
-- Fix the issue where exploiters can make server-sided pies not burn on burn bricks
-- Server-sided pies act a little weird on cilent-sided parts
+Some known issues:
+- Exploiters can make server-sided pies not burn on burn bricks.
+- Server-sided pies act a little weird on cilent-sided parts.

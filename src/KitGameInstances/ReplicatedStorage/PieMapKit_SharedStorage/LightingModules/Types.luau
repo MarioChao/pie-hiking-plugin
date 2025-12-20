@@ -23,19 +23,12 @@ export type LightingProperties = {
 	TimeOfDay: string?,
 }
 
-export type PostEffectTypes = {
-	Bloom: BloomEffect?,
-	Blur: BlurEffect?,
-	ColorCorrection: ColorCorrectionEffect?,
-	DepthOfField: DepthOfFieldEffect?,
-	SunRays: SunRaysEffect?,
-}
-
 export type LightingConfigType = {
 	Atmosphere: Atmosphere?,
 	Lighting: LightingProperties?,
-	PostProcessing: PostEffectTypes?,
+	PostProcessing: {PostEffect}?,
 	Sky: Sky?,
+	tweenDuration: number?,
 }
 
 
