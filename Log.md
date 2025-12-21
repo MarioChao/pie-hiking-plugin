@@ -3,6 +3,12 @@
 TODO:
 - Simplify code for activators (ex: touch, zone).
 
+## [v1.3.6] Lighting small fix | 2025/12/21
+
+Last applied lighting config is now stored & retrieved from `UpdateLighting`.
+
+Server-sided lighting update is now applied on each client separatedly (tweened), then applied on the server instantly.
+
 ## [v1.3.5] Lighting zones + UIUtil invisible + Small fixes | 2025/12/20
 
 Added `LightingZones`, client-sided zones that change the lighting according to a child "LightingConfig" `ModuleScript`.

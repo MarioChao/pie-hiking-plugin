@@ -85,6 +85,8 @@ table.freeze(Constants)
 local Globals = {}
 Globals.playerConnected = {} :: {[Player]: boolean}
 
+Globals.lastAppliedLightingConfig = {} :: LightingConfigType
+
 
 ---------- Local functions ----------
 
@@ -234,16 +236,29 @@ function UpdateLightingModule.applyLightingConfig(lightingConfig: LightingConfig
 	if not lightingConfig then
 		return
 	end
-	if specificPlayer and RunService:IsServer() then
-		task.defer(function()
-			local startTime = time()
-			while not Globals.playerConnected[specificPlayer] and time() - startTime < 5 do
-				task.wait()
+	if RunService:IsServer() then
+		if specificPlayer then
+			task.defer(function()
+				local startTime = time()
+				while not Globals.playerConnected[specificPlayer] and time() - startTime < 5 do
+					task.wait()
+				end
+				if Globals.playerConnected[specificPlayer] then
+					Constants.lightingRemoteEvent:FireClient(specificPlayer, Constants.remoteEventStrings.client.updateLighting, lightingConfig)
+				end
+			end)
+		else
+			for _, player in Players:GetPlayers() do
+				UpdateLightingModule.applyLightingConfig(lightingConfig, player)
 			end
-			if Globals.playerConnected[specificPlayer] then
-				Constants.lightingRemoteEvent:FireClient(specificPlayer, Constants.remoteEventStrings.client.updateLighting, lightingConfig)
-			end
-		end)
+			task.defer(function()
+				local instantTween = TweenInfo.new(0)
+				updateAtmosphere(lightingConfig.Atmosphere, instantTween)
+				updateLightingProperties(lightingConfig.Lighting, instantTween)
+				updatePostEffects(lightingConfig.PostProcessing, instantTween)
+				updateSky(lightingConfig.Sky, instantTween)
+			end)
+		end
 	else
 		local tweenInfo
 		if lightingConfig.tweenDuration then
@@ -251,11 +266,16 @@ function UpdateLightingModule.applyLightingConfig(lightingConfig: LightingConfig
 		else
 			tweenInfo = Constants.defaultTweenInfo
 		end
+		Globals.lastAppliedLightingConfig = lightingConfig
 		updateAtmosphere(lightingConfig.Atmosphere, tweenInfo)
 		updateLightingProperties(lightingConfig.Lighting, tweenInfo)
 		updatePostEffects(lightingConfig.PostProcessing, tweenInfo)
 		updateSky(lightingConfig.Sky, tweenInfo)
 	end
+end
+
+function UpdateLightingModule.getLastAppliedLightingConfig()
+	return Globals.lastAppliedLightingConfig
 end
 
 

@@ -49,8 +49,6 @@ local Globals = {}
 -- Although no connections are made, this table is still used for accessing container instances
 Globals.taggedContainerConnections = {} :: {[Instance]: ObjectConnections}
 
-Globals.previousLightingConfig = nil :: LightingConfig?
-
 
 ---------- Local functions ----------
 
@@ -134,12 +132,12 @@ updateContainerLighting = function(container: Instance)
 	local lightingConfig = getLightingConfig(container)
 
 	-- Validate different lighting
-	if isSameLightingConfig(Globals.previousLightingConfig, lightingConfig) then
+	local lastAppliedLightingConfig = UpdateLighting.getLastAppliedLightingConfig()
+	if isSameLightingConfig(lastAppliedLightingConfig, lightingConfig) then
 		return
 	end
 
 	-- Set lighting
-	Globals.previousLightingConfig = lightingConfig
 	UpdateLighting.applyLightingConfig(lightingConfig)
 end
 
