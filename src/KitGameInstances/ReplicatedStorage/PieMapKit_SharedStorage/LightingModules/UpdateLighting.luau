@@ -68,9 +68,15 @@ table.freeze(Constants.postEffectClassNames)
 Constants.default_postEffectClassName_instance = {
 	BloomEffect = Instance.new("BloomEffect"),
 	BlurEffect = Instance.new("BlurEffect"),
+	DepthOfFieldEffect = Instance.new("DepthOfFieldEffect"),
+	SunRaysEffect = Instance.new("SunRaysEffect"),
 }
 Constants.default_postEffectClassName_instance.BloomEffect.Intensity = 0
 Constants.default_postEffectClassName_instance.BlurEffect.Size = 0
+Constants.default_postEffectClassName_instance.DepthOfFieldEffect.FarIntensity = 0
+Constants.default_postEffectClassName_instance.DepthOfFieldEffect.NearIntensity = 0
+Constants.default_postEffectClassName_instance.SunRaysEffect.Intensity = 0
+Constants.default_postEffectClassName_instance.SunRaysEffect.Spread = 0
 table.freeze(Constants.default_postEffectClassName_instance)
 
 Constants.prefix = "UpdateLighting_"
@@ -85,7 +91,7 @@ table.freeze(Constants)
 local Globals = {}
 Globals.playerConnected = {} :: {[Player]: boolean}
 
-Globals.lastAppliedLightingConfig = {} :: LightingConfigType
+Globals.lastAppliedLightingConfig = nil :: LightingConfigType?
 
 
 ---------- Local functions ----------
@@ -117,10 +123,8 @@ getOrRenameOrCreateChildInstance = function(parent: Instance, name: string, clas
 			else
 				result = Instance.new(className)
 			end
+			result.Name = name
 			result.Parent = parent
-			task.delay(1, function()
-				result.Name = name
-			end)
 		end
 	end
 	return result
@@ -248,16 +252,15 @@ function UpdateLightingModule.applyLightingConfig(lightingConfig: LightingConfig
 				end
 			end)
 		else
+			local instantTween = TweenInfo.new(0)
+			updateAtmosphere(lightingConfig.Atmosphere, instantTween)
+			updateLightingProperties(lightingConfig.Lighting, instantTween)
+			updatePostEffects(lightingConfig.PostProcessing, instantTween)
+			updateSky(lightingConfig.Sky, instantTween)
+			task.wait()
 			for _, player in Players:GetPlayers() do
 				UpdateLightingModule.applyLightingConfig(lightingConfig, player)
 			end
-			task.defer(function()
-				local instantTween = TweenInfo.new(0)
-				updateAtmosphere(lightingConfig.Atmosphere, instantTween)
-				updateLightingProperties(lightingConfig.Lighting, instantTween)
-				updatePostEffects(lightingConfig.PostProcessing, instantTween)
-				updateSky(lightingConfig.Sky, instantTween)
-			end)
 		end
 	else
 		local tweenInfo

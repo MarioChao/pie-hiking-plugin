@@ -9,6 +9,8 @@ Last applied lighting config is now stored & retrieved from `UpdateLighting`.
 
 Server-sided lighting update is now applied on each client separatedly (tweened), then applied on the server instantly.
 
+Fixed default post-processing effects having significant intensities and other effects.
+
 ## [v1.3.5] Lighting zones + UIUtil invisible + Small fixes | 2025/12/20
 
 Added `LightingZones`, client-sided zones that change the lighting according to a child "LightingConfig" `ModuleScript`.
