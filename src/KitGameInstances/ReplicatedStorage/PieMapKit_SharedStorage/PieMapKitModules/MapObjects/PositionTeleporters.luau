@@ -10,6 +10,7 @@ local Module = {}
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
 
 
 ---------- Types ----------
@@ -20,12 +21,22 @@ type ObjectConnections = {[Instance]: {RBXScriptConnection}}
 ---------- Instances ----------
 
 
----------- Variables ----------
+---------- Constants ----------
 
-local containerName1 = "Teleporters"
-local containerName2 = "Destinations"
+local Constants = {}
 
-local taggedContainerConnections: {[Instance]: ObjectConnections} = {}
+Constants.containerName1 = "Teleporters"
+Constants.containerName2 = "Destinations"
+
+table.freeze(Constants)
+
+
+---------- Globals ----------
+
+local Globals = {}
+
+Globals.taggedContainerConnections = {} :: {[Instance]: ObjectConnections}
+Globals.teleportPlayer_throttled = {} :: {[Player]: boolean}
 
 
 ---------- Helper functions ----------
@@ -41,11 +52,33 @@ local function createDefault<K, V>(table: {[K]: V}, key: K, default: V)
 	end
 end
 
+local function transitionPivotToPosition(pivotInstance: PVInstance, targetPosition: Vector3, transitionTime: number)
+	local initialPosition = pivotInstance:GetPivot().Position
+	local startTime = time()
+	local currentTime = 0
+	while currentTime < transitionTime do
+		-- Move
+		local rawAlpha = currentTime / transitionTime
+		local tweenedAlpha = TweenService:GetValue(rawAlpha, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
+		local intermediatePosition = initialPosition:Lerp(targetPosition, tweenedAlpha)
+		local intermediateCFrame = pivotInstance:GetPivot().Rotation + intermediatePosition
+		pivotInstance:PivotTo(intermediateCFrame)
+
+		-- Wait
+		RunService.Heartbeat:Wait()
+		currentTime = time() - startTime
+	end
+
+	-- Move to target
+	local targetCFrame = pivotInstance:GetPivot().Rotation + targetPosition
+	pivotInstance:PivotTo(targetCFrame)
+end
+
 
 ---------- Local functions ----------
 -- Define general functions here
 
-local function onTeleporterActivated(container: Instance, character: Model)
+local function onTeleporterActivated(container: Instance, character: Model?)
 	-- Validate player
 	local player = Players:GetPlayerFromCharacter(character)
 	if not (character and player) then
@@ -59,41 +92,65 @@ local function onTeleporterActivated(container: Instance, character: Model)
 	end
 
 	-- Validate humanoid root part
-	local humanoidRootPart = character:WaitForChild("HumanoidRootPart") :: BasePart?
+	local humanoidRootPart = character:WaitForChild("HumanoidRootPart") :: BasePart
 	if not humanoidRootPart then
 		return
 	end
 
 	-- Get destination container
-	local destinationContainer = container:FindFirstChild(containerName2)
+	local destinationContainer = container:FindFirstChild(Constants.containerName2)
 	if not destinationContainer then
 		return
 	end
 
-	-- Select a destination part
-	local destinationParts: {BasePart} = {}
-	for _, object in destinationContainer:GetChildren() do
-		if object:IsA("BasePart") then
-			table.insert(destinationParts, object)
+	-- Check throttle
+	if Globals.teleportPlayer_throttled[player] then
+		return
+	end
+	Globals.teleportPlayer_throttled[player] = true
+
+	do
+		-- Select a destination part
+		local destinationParts: {BasePart} = {}
+		for _, object in destinationContainer:GetChildren() do
+			if object:IsA("BasePart") then
+				table.insert(destinationParts, object)
+			end
+		end
+		local destinationPart: BasePart = getRandomElement(destinationParts)
+	
+		-- Get destination position
+		local destinationPosition = destinationPart.CFrame.Position
+		destinationPosition += Vector3.new(0, destinationPart.Size.Y / 2, 0)
+	
+		-- Get transition time
+		local transitionTime = tonumber(container:GetAttribute("TransitionTime")) or 0
+	
+		-- Move player to destination
+		if transitionTime < 1e-9 then
+			-- Instant
+			local destinationCFrame = CFrame.new(destinationPosition)
+			destinationCFrame *= humanoidRootPart.CFrame.Rotation
+			humanoidRootPart:PivotTo(destinationCFrame)
+		else
+			-- Transition
+			humanoidRootPart.Anchored = true
+			humanoidRootPart.AssemblyLinearVelocity = Vector3.zero
+			humanoidRootPart.AssemblyAngularVelocity = Vector3.zero
+			transitionPivotToPosition(humanoidRootPart, destinationPosition, transitionTime)
+			humanoidRootPart.Anchored = false
 		end
 	end
-	local destinationPart: BasePart = getRandomElement(destinationParts)
 
-	-- Get destination CFrame
-	local destinationCFrame = CFrame.new(destinationPart.CFrame.Position)
-	destinationCFrame += Vector3.new(0, destinationPart.Size.Y / 2, 0)
-	destinationCFrame *= humanoidRootPart.CFrame.Rotation
-
-	-- Move player to destination
-	humanoidRootPart:PivotTo(destinationCFrame)
-	-- character:PivotTo(destinationCFrame)
+	-- Revert throttle
+	Globals.teleportPlayer_throttled[player] = nil
 end
 
 -- For subcontainer 1 (teleporters)
 
 local function setUpChildObject1(container: Instance, part: BasePart)
 	-- Get container connections
-	local objectConnections = taggedContainerConnections[container]
+	local objectConnections = Globals.taggedContainerConnections[container]
 
 	-- Set up connections
 	local connections = {}
@@ -101,7 +158,7 @@ local function setUpChildObject1(container: Instance, part: BasePart)
 
 	-- Create connections
 	table.insert(connections, part.Touched:Connect(function(otherPart: BasePart)
-		onTeleporterActivated(container, otherPart.Parent)
+		onTeleporterActivated(container, otherPart.Parent :: Model)
 	end))
 end
 
@@ -112,7 +169,7 @@ local function onChildObjectAdded1(container: Instance, child: Instance)
 	end
 
 	-- Get container connections
-	local objectConnections = taggedContainerConnections[container]
+	local objectConnections = Globals.taggedContainerConnections[container]
 
 	-- Validate unique
 	if objectConnections[child] then
@@ -123,23 +180,23 @@ local function onChildObjectAdded1(container: Instance, child: Instance)
 	setUpChildObject1(container, child)
 end
 
-local function cleanUpChildObject1(container: Instance, part: BasePart)
+local function cleanUpChildObject1(container: Instance, child: Instance)
 	-- Get container connections
-	local objectConnections = taggedContainerConnections[container]
+	local objectConnections = Globals.taggedContainerConnections[container]
 
 	-- Disconnect and remove stored connections
-	for _, connection in objectConnections[part] do
+	for _, connection in objectConnections[child] do
 		connection:Disconnect()
 	end
-	objectConnections[part] = nil
+	objectConnections[child] = nil
 end
 
 local function setUpObjectSubcontainer1(container: Instance)
 	-- Get container connections
-	local objectConnections = taggedContainerConnections[container]
+	local objectConnections = Globals.taggedContainerConnections[container]
 
 	-- Get subcontainer
-	local subcontainer = container:WaitForChild(containerName1)
+	local subcontainer = container:WaitForChild(Constants.containerName1)
 
 	-- Clicked subcontainer
 	do
@@ -197,13 +254,19 @@ end
 -- The container
 
 local function setUpObjectContainer(container: Instance)
-	-- Validate client
-	if not RunService:IsClient() then
-		return
+	-- Validate environment
+	if container:GetAttribute("IsServerSided") == true then
+		if not RunService:IsServer() then
+			return
+		end
+	else
+		if not RunService:IsClient() then
+			return
+		end
 	end
 
 	-- Set up connections
-	taggedContainerConnections[container] = {}
+	Globals.taggedContainerConnections[container] = {}
 
 	-- Create connections
 	setUpObjectSubcontainer1(container)
@@ -211,14 +274,14 @@ end
 
 local function cleanUpObjectContainer(container: Instance)
 	-- Disconnect and remove stored connections
-	if taggedContainerConnections[container] then
-		for object, connections in taggedContainerConnections[container] do
+	if Globals.taggedContainerConnections[container] then
+		for object, connections in Globals.taggedContainerConnections[container] do
 			for _, connection in connections do
 				connection:Disconnect()
 			end
-			taggedContainerConnections[container][object] = nil
+			Globals.taggedContainerConnections[container][object] = nil
 		end
-		taggedContainerConnections[container] = nil
+		Globals.taggedContainerConnections[container] = nil
 	end
 end
 
@@ -236,7 +299,7 @@ function Module.addInstance(object: Instance)
 	end
 
 	-- Validate unique
-	if taggedContainerConnections[object] then
+	if Globals.taggedContainerConnections[object] then
 		return
 	end
 

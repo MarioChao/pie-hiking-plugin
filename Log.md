@@ -3,6 +3,12 @@
 TODO:
 - Simplify code for activators (ex: touch, zone).
 
+## [v1.3.7] Improved position teleporters | 2026/02/23
+
+New position teleporter attributes:
+- `IsServerSided` to allow long-distance teleporting in streaming-enabled places.
+- `TransitionTime` to fade players to the destination.
+
 ## [v1.3.6] Lighting small fix | 2025/12/21
 
 Last applied lighting config is now stored & retrieved from `UpdateLighting`.
