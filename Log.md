@@ -3,6 +3,12 @@
 TODO:
 - Simplify code for activators (ex: touch, zone).
 
+## [v1.3.8] Pie throwing direction fix | 2026/02/28
+
+Fixed pies launching in the direction of the accessories and tools of other players.
+- Collision groups are now set on all descendant parts (instead of just the child parts) of other player characters.
+- Parts in the "LocalPlayer" and "OtherPlayers" collision groups are automatically set to "Default" when unparented from a player character.
+
 ## [v1.3.7] Improved position teleporters | 2026/02/23
 
 New position teleporter attributes:

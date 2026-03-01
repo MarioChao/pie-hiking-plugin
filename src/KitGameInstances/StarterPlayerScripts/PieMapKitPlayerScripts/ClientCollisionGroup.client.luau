@@ -1,4 +1,5 @@
 --!strict
+
 -- Client Collision Script
 
 
@@ -16,56 +17,90 @@ end
 local Players = game:GetService("Players")
 
 
----------- Instances ----------
+---------- Constants ----------
 
-local LocalPlayer = Players.LocalPlayer or Players:GetPropertyChangedSignal("LocalPlayer"):Wait() :: Player
+local Constants = {}
+
+Constants.localPlayer = Players.LocalPlayer or Players:GetPropertyChangedSignal("LocalPlayer"):Wait() :: Player
+
+table.freeze(Constants)
+
+
+---------- Globals ----------
+
+local Globals = {}
+
+Globals.part_parentConnection = {} :: {[BasePart]: RBXScriptConnection}
 
 
 ---------- Local functions ----------
 
--- Character collisions
+local getIsDescendantOfPlayerCharacter
+local connectUnparentSetDefault
+local onOtherCharacterDescendantAdded
+local onOtherCharacterAdded
+local onOtherPlayerAdded
+local onLocalCharacterDescendantAdded
+local onLocalCharacterAdded
+local onLocalPlayerAdded
 
-local function onOtherCharacterChildAdded(object: Instance)
+
+----- Unparent -----
+
+getIsDescendantOfPlayerCharacter = function(object: Instance)
+	for _, player in Players:GetPlayers() do
+		local character = player.Character
+		if character then
+			if object:IsDescendantOf(character) then
+				return true
+			end
+		end
+	end
+	return false
+end
+
+connectUnparentSetDefault = function(part: Instance)
+	if part:IsA("BasePart") then
+		if Globals.part_parentConnection[part] then
+			Globals.part_parentConnection[part]:Disconnect()
+		end
+		Globals.part_parentConnection[part] = part.AncestryChanged:Connect(function()
+			if table.find({"LocalPlayer", "OtherPlayers"}, part.CollisionGroup) then
+				if not getIsDescendantOfPlayerCharacter(part) then
+					part.CollisionGroup = "Default"
+					Globals.part_parentConnection[part]:Disconnect()
+					Globals.part_parentConnection[part] = nil
+				end
+			end
+		end)
+	end
+end
+
+
+----- Other players -----
+
+onOtherCharacterDescendantAdded = function(object: Instance)
 	-- Set collision group
-	if object:IsA("BasePart") then
+	if object:IsA("BasePart") and table.find({"Default", "LocalPlayer"}, object.CollisionGroup) then
 		object.CollisionGroup = "OtherPlayers"
+		connectUnparentSetDefault(object)
 	end
 end
 
-local function onLocalCharacterChildAdded(object: Instance)
-	-- Set collision group
-	if object:IsA("BasePart") and not object:FindFirstAncestorWhichIsA("Tool") then
-		object.CollisionGroup = "LocalPlayer"
-	end
-end
-
-local function onOtherCharacterAdded(character: Model)
-	-- Look through child parts
-	local children = character:GetChildren()
+onOtherCharacterAdded = function(character: Model)
+	-- Current descendant parts
+	local children = character:GetDescendants()
 	task.defer(function()
 		for _, object in children do
-			onOtherCharacterChildAdded(object)
+			onOtherCharacterDescendantAdded(object)
 		end
 	end)
 
-	-- Listen for future parts
-	character.ChildAdded:Connect(onOtherCharacterChildAdded)
+	-- Future descendant parts
+	character.DescendantAdded:Connect(onOtherCharacterDescendantAdded)
 end
 
-local function onLocalCharacterAdded(character: Model)
-	-- Look through child parts
-	local children = character:GetChildren()
-	task.defer(function()
-		for _, object in children do
-			onLocalCharacterChildAdded(object)
-		end
-	end)
-
-	-- Listen for future parts
-	character.ChildAdded:Connect(onLocalCharacterChildAdded)
-end
-
-local function onOtherPlayerAdded(player: Player)
+onOtherPlayerAdded = function(player: Player)
 	-- Set up other players
 	local character = player.Character
 	if character then
@@ -76,24 +111,53 @@ local function onOtherPlayerAdded(player: Player)
 	player.CharacterAdded:Connect(onOtherCharacterAdded)
 end
 
-local function setUpLocalPlayer()
+
+------- Local player -----
+
+onLocalCharacterDescendantAdded = function(object: Instance)
+	-- Set collision group
+	if object:IsA("BasePart") and table.find({"Default", "OtherPlayers"}, object.CollisionGroup) then
+		if object.Parent == Constants.localPlayer.Character then
+			object.CollisionGroup = "LocalPlayer"
+			connectUnparentSetDefault(object)
+		else
+			object.CollisionGroup = "Default"
+		end
+	end
+end
+
+onLocalCharacterAdded = function(character: Model)
+	-- Current descendant parts
+	local children = character:GetDescendants()
+	task.defer(function()
+		for _, object in children do
+			onLocalCharacterDescendantAdded(object)
+		end
+	end)
+
+	-- Future descendant parts
+	character.DescendantAdded:Connect(onLocalCharacterDescendantAdded)
+end
+
+onLocalPlayerAdded = function()
 	-- Set up local player
-	local character = LocalPlayer.Character
+	local character = Constants.localPlayer.Character
 	if character then
 		task.defer(function()
 			onLocalCharacterAdded(character)
 		end)
 	end
-	LocalPlayer.CharacterAdded:Connect(onLocalCharacterAdded)
+	Constants.localPlayer.CharacterAdded:Connect(onLocalCharacterAdded)
 end
 
-local function setUpPlayerCollisions()
-	-- Local player
-	setUpLocalPlayer()
 
+----- Main -----
+
+local function main()
 	-- Other players
+	local initialPlayers = Players:GetPlayers()
 	task.defer(function()
-		for _, player in Players:GetPlayers() do
+		for _, player in initialPlayers do
 			if player ~= Players.LocalPlayer then
 				task.defer(function()
 					onOtherPlayerAdded(player)
@@ -102,9 +166,12 @@ local function setUpPlayerCollisions()
 		end
 	end)
 	Players.PlayerAdded:Connect(onOtherPlayerAdded)
+
+	-- Local player
+	onLocalPlayerAdded()
 end
 
 
----------- Calling / connecting functions ----------
+---------- Calling function ----------
 
-setUpPlayerCollisions()
+main()
