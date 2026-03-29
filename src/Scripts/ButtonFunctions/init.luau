@@ -50,6 +50,10 @@ end
 
 ---------- Module functions ----------
 
+function ButtonFunctions.insertPiePackage()
+	defaultWrapper("Insert pie package", PieTool.insertPackage)
+end
+
 function ButtonFunctions.setUpPieTool()
 	defaultWrapper("Set up pie tool", PieTool.setUp)
 end

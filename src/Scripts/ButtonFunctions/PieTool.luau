@@ -1,9 +1,6 @@
 --!strict
+
 -- Pie Tool Module
-
-
----------- Module ----------
-local Module = {}
 
 
 ---------- Services ----------
@@ -13,29 +10,36 @@ local Selection = game:GetService("Selection")
 local ServerScriptService = game:GetService("ServerScriptService")
 local ServerStorage = game:GetService("ServerStorage")
 local StarterPack = game:GetService("StarterPack")
-local StarterPlayer = game:GetService("StarterPlayer")
 
 
----------- Instances ----------
+---------- Constants ----------
 
-local PluginFolder = script.Parent.Parent.Parent
+local Constants = {}
 
-local HeartPie: Tool
+Constants.pluginFolder = script.Parent.Parent.Parent
 
-local HeartPie_ContainerScripts
+Constants.assets = Constants.pluginFolder:FindFirstChild("Assets")
+Constants.heartPie_folder = Constants.assets.HeartPie_Package
+Constants.heartPie_tool = Constants.heartPie_folder.HeartPie
+Constants.containerScripts = Constants.heartPie_folder["ContainerScripts (see ReadMe)"]
+Constants.containerSetUp = Constants.heartPie_folder.ContainerSetUp
 
-local DevPackages = PluginFolder:FindFirstChild("DevPackages")
-if DevPackages then
-	-- This is for type-checking with Roblox LSP on VSCode
-	local DevPackagesIndex = DevPackages._Index
-	HeartPie = DevPackagesIndex["mariochao_heart-pie@1.0.6"]["heart-pie"]
-end
+Constants.strings = {
+	packageName = "HeartPie_Package",
+	classicPieName = "Classic Heart Pie (from plugin)",
+	beginnerPieName = "Beginner Heart Pie (from plugin)",
+}
+
+table.freeze(Constants.strings)
+table.freeze(Constants)
 
 
----------- Variables ----------
+---------- Globals ----------
 
-local classicPieName = "Classic Heart Pie (from plugin)"
-local beginnerPieName = "Beginner Heart Pie (from plugin)"
+local Globals = {}
+
+Globals.heartPie_tool = Constants.heartPie_tool:Clone()
+Globals.containerScripts = Constants.containerScripts:Clone()
 
 
 ---------- Local functions ----------
@@ -70,18 +74,31 @@ end
 
 ---------- Set up functions ----------
 
+local function insertPiePackage(): {Instance}
+	if ServerStorage:FindFirstChild(Constants.strings.packageName) then
+		warn(`A {Constants.strings.packageName} already exists in ServerStorage.`)
+		return {}
+	end
+
+	local newPackageFolder = Constants.heartPie_folder:Clone()
+	newPackageFolder.Name = Constants.strings.packageName
+	newPackageFolder.Parent = ServerStorage
+
+	return {newPackageFolder}
+end
+
 local function setUpPieToolContainers(): {Instance}
 	local addedInstances = {}
 
 	local canSetUp = (
-		(HeartPie_ContainerScripts and HeartPie_ContainerScripts:IsA("Folder"))
-		and HeartPie_ContainerScripts:FindFirstChild("ReplicatedStorage")
+		(Globals.containerScripts and Globals.containerScripts:IsA("Folder"))
+		and Globals.containerScripts:FindFirstChild("ReplicatedStorage")
 	)
 	if not canSetUp then
 		warn("Set up error: can't set up heart pie!")
 	end
 
-	for _, object in HeartPie_ContainerScripts.ReplicatedStorage:GetChildren() do
+	for _, object in Globals.containerScripts.ReplicatedStorage:GetChildren() do
 		-- Special case
 		if object.Name == "PieHikingModules" then
 			table.insert(addedInstances, replaceIfNotFound(ReplicatedStorage, object))
@@ -101,11 +118,11 @@ local function setUpPieToolContainers(): {Instance}
 		local newObject = replaceWithNew(ReplicatedStorage, object)
 		table.insert(addedInstances, newObject)
 	end
-	for _, object in HeartPie_ContainerScripts.ServerScriptService:GetChildren() do
+	for _, object in Globals.containerScripts.ServerScriptService:GetChildren() do
 		local newObject = replaceWithNew(ServerScriptService, object)
 		table.insert(addedInstances, newObject)
 	end
-	for _, object in HeartPie_ContainerScripts.ServerStorage:GetChildren() do
+	for _, object in Globals.containerScripts.ServerStorage:GetChildren() do
 		-- Special case
 		if object.Name == "PieHikingServerStorage" then
 			table.insert(addedInstances, replaceIfNotFound(ServerStorage, object))
@@ -126,35 +143,31 @@ local function setUpPieToolContainers(): {Instance}
 		local newObject = replaceWithNew(ServerStorage, object)
 		table.insert(addedInstances, newObject)
 	end
-	for _, object in HeartPie_ContainerScripts.StarterPlayerScripts:GetChildren() do
-		local newObject = replaceWithNew(StarterPlayer.StarterPlayerScripts, object)
-		table.insert(addedInstances, newObject)
-	end
 
 	return addedInstances
 end
 
 local function insertClassicPieTool(): {Instance}
-	if StarterPack:FindFirstChild(classicPieName) then
-		warn(`A {classicPieName} already exists in StarterPack.`)
+	if StarterPack:FindFirstChild(Constants.strings.classicPieName) then
+		warn(`A {Constants.strings.classicPieName} already exists in StarterPack.`)
 		return {}
 	end
 
-	local newHeartPie: typeof(HeartPie) = HeartPie:Clone()
-	newHeartPie.Name = classicPieName
+	local newHeartPie = Globals.heartPie_tool:Clone()
+	newHeartPie.Name = Constants.strings.classicPieName
 	newHeartPie.Parent = StarterPack
 
 	return {newHeartPie}
 end
 
 local function insertBeginnerPieTool(): {Instance}
-	if StarterPack:FindFirstChild(beginnerPieName) then
-		warn(`A {beginnerPieName} already exists in StarterPack.`)
+	if StarterPack:FindFirstChild(Constants.strings.beginnerPieName) then
+		warn(`A {Constants.strings.beginnerPieName} already exists in StarterPack.`)
 		return {}
 	end
 
-	local newHeartPie: typeof(HeartPie) = HeartPie:Clone()
-	newHeartPie.Name = beginnerPieName
+	local newHeartPie = Globals.heartPie_tool:Clone()
+	newHeartPie.Name = Constants.strings.beginnerPieName
 	newHeartPie:SetAttribute("CanCollideThrower", false)
 	newHeartPie:SetAttribute("LaunchOffsetStuds", 0)
 	newHeartPie:SetAttribute("LaunchVelocity", 95)
@@ -164,13 +177,26 @@ local function insertBeginnerPieTool(): {Instance}
 end
 
 local function refreshPieTool()
-	HeartPie = game:GetObjects("rbxassetid://18174104986")[1]
+	Globals.heartPie_tool:Destroy()
+	Globals.heartPie_tool = Constants.heartPie_tool:Clone()
 
-	HeartPie_ContainerScripts = HeartPie:FindFirstChild("ContainerScripts (see ReadMe)") or HeartPie:FindFirstChild("ContainerScripts")
+	Globals.containerScripts:Destroy()
+	Globals.containerScripts = Constants.containerScripts:Clone()
 end
 
 
----------- Module functions ----------
+---------- Module ----------
+
+local Module = {}
+
+
+----- Module fields -----
+
+function Module.insertPackage()
+	refreshPieTool()
+	local addedInstances = insertPiePackage()
+	Selection:Set(addedInstances)
+end
 
 function Module.setUp()
 	refreshPieTool()
@@ -192,4 +218,6 @@ end
 
 
 ---------- Return module ----------
+
+table.freeze(Module)
 return Module

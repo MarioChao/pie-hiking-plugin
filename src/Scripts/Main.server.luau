@@ -31,7 +31,7 @@ local PieHikingToolbarButton: PluginToolbarButton
 local PieHikingWidget: DockWidgetPluginGui
 
 local WidgetGuis = PluginFolder.WidgetGuis
-local PieHikingWidgetGui = WidgetGuis.PieHiking
+local PieHikingWidgetGui = WidgetGuis.PieHikingPluginGuis
 
 local widgetInfo = DockWidgetPluginGuiInfo.new(
 	Enum.InitialDockState.Float,
@@ -71,7 +71,7 @@ end
 
 local function setUpPluginWidgets()
 	-- Create widget
-	PieHikingWidget = plugin:CreateDockWidgetPluginGui("Pie Hiking Widget", widgetInfo)
+	PieHikingWidget = plugin:CreateDockWidgetPluginGuiAsync("Pie Hiking Widget", widgetInfo)
 	PieHikingWidget.Title = "Pie Hiking"
 	PieHikingWidget.Name = "PieHikingPluginGui"
 
@@ -83,16 +83,21 @@ local function setUpPluginWidgets()
 end
 
 local function setUpPluginWidgetButtons()
-	-- Set-up button events
-	local setUpFrame = PieHikingWidgetGui.ScrollingFrame.SetUpFrame
-	setUpFrame.PieToolSetUpButton.MouseButton1Click:Connect(ButtonFunctions.setUpPieTool)
-	setUpFrame.PieToolClassicInsertButton.MouseButton1Click:Connect(ButtonFunctions.insertClassicPieTool)
-	setUpFrame.PieToolBeginnerInsertButton.MouseButton1Click:Connect(ButtonFunctions.insertBeginnerPieTool)
-	setUpFrame.MapKitSetUpButton.MouseButton1Click:Connect(ButtonFunctions.setUpMapKit)
-	setUpFrame.MapKitInsertButton.MouseButton1Click:Connect(ButtonFunctions.insertMapKit)
+	-- Pie button events
+	local scrollingFrame = PieHikingWidgetGui.ScrollingFrame
+	local pieFrame = scrollingFrame.PieFrame.Button_Frame
+	pieFrame.PiePackageInsertButton.MouseButton1Click:Connect(ButtonFunctions.insertPiePackage)
+	pieFrame.PieToolSetUpButton.MouseButton1Click:Connect(ButtonFunctions.setUpPieTool)
+	pieFrame.PieToolClassicInsertButton.MouseButton1Click:Connect(ButtonFunctions.insertClassicPieTool)
+	pieFrame.PieToolBeginnerInsertButton.MouseButton1Click:Connect(ButtonFunctions.insertBeginnerPieTool)
+
+	-- Map kit button events
+	local mapKitFrame = scrollingFrame.MapKitFrame.Button_Frame
+	mapKitFrame.MapKitSetUpButton.MouseButton1Click:Connect(ButtonFunctions.setUpMapKit)
+	mapKitFrame.MapKitInsertButton.MouseButton1Click:Connect(ButtonFunctions.insertMapKit)
 
 	-- Animation button events
-	local animationFrame = PieHikingWidgetGui.ScrollingFrame.AnimationFrame
+	local animationFrame = scrollingFrame.AnimationFrame.Button_Frame
 	animationFrame.AnimationInsertButton.MouseButton1Click:Connect(ButtonFunctions.insertAnimation)
 end
 
@@ -105,12 +110,13 @@ local function setUpPluginWidgetUis()
 	-- Set up mouse cursors
 	MouseCursor.setPlugin(plugin)
 	local buttons = {
-		PieHikingWidgetGui.ScrollingFrame.SetUpFrame.PieToolSetUpButton,
-		PieHikingWidgetGui.ScrollingFrame.SetUpFrame.PieToolClassicInsertButton,
-		PieHikingWidgetGui.ScrollingFrame.SetUpFrame.PieToolBeginnerInsertButton,
-		PieHikingWidgetGui.ScrollingFrame.SetUpFrame.MapKitSetUpButton,
-		PieHikingWidgetGui.ScrollingFrame.SetUpFrame.MapKitInsertButton,
-		PieHikingWidgetGui.ScrollingFrame.AnimationFrame.AnimationInsertButton,
+		PieHikingWidgetGui.ScrollingFrame.PieFrame.Button_Frame.PiePackageInsertButton,
+		PieHikingWidgetGui.ScrollingFrame.PieFrame.Button_Frame.PieToolSetUpButton,
+		PieHikingWidgetGui.ScrollingFrame.PieFrame.Button_Frame.PieToolClassicInsertButton,
+		PieHikingWidgetGui.ScrollingFrame.PieFrame.Button_Frame.PieToolBeginnerInsertButton,
+		PieHikingWidgetGui.ScrollingFrame.MapKitFrame.Button_Frame.MapKitSetUpButton,
+		PieHikingWidgetGui.ScrollingFrame.MapKitFrame.Button_Frame.MapKitInsertButton,
+		PieHikingWidgetGui.ScrollingFrame.AnimationFrame.Button_Frame.AnimationInsertButton,
 	}
 	for _, object in buttons do
 		object.MouseEnter:Connect(function()

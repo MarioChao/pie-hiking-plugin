@@ -3,6 +3,18 @@
 TODO:
 - Simplify code for activators (ex: touch, zone).
 
+## [v1.3.9] Pie package update | 2026/03/28
+
+Migrated to Heart Pie package:
+- Uses [Heart Pie v1.0.14](wally.run/package/mariochao/heart-pie?version=1.0.14) on wally.
+- No longer uses `game:GetObjects()`.
+
+Added new button for inserting the pie package.
+
+Slightly refactored the `PieTool` module script.
+
+Slightly adjusted the user interfaces.
+
 ## [v1.3.8] Pie throwing direction fix | 2026/02/28
 
 Fixed pies launching in the direction of the accessories and tools of other players.

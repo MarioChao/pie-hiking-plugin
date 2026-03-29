@@ -8,9 +8,9 @@
 wally.lock
 
 # Packages
-**/Packages/
-**/ServerPackages/
-**/DevPackages/
-**/TestPackages/
+/Packages
+/ServerPackages
+/DevPackages
+/TestPackages
 
 sourcemap.json
