@@ -5,17 +5,8 @@
 
 		"ServerStorage": {
 			"pie-hiking-plugin": {
-				"$path": "src",
-
-				"Assets": {
-					"$className": "Folder",
-
-					"HeartPie_Package": {
-						"$path": "DevPackages/_Index/mariochao_heart-pie@1.0.14/heart-pie/src/HeartPie"
-					}
-				}
+				"$path": "src"
 			}
 		}
-	},
-	"emitLegacyScripts": true
+	}
 }

@@ -1,9 +1,6 @@
 --!strict
--- Button Functions Module
 
-
----------- Module ----------
-local ButtonFunctions = {}
+-- Button Functions
 
 
 ---------- Services ----------
@@ -18,14 +15,19 @@ local PieTool = require(script.PieTool)
 local DGAnimation = require(script.DGAnimation)
 
 
----------- Variables ----------
+---------- Globals ----------
 
-local defaultWrapper
+local Globals = {}
 
 
 ---------- Local functions ----------
 
-local function changeHistoryServiceWrap(warnMessage: string, finishOperation: Enum.FinishRecordingOperation)
+local changeHistoryServiceWrap
+
+
+----- Change history -----
+
+changeHistoryServiceWrap = function(warnMessage: string, finishOperation: Enum.FinishRecordingOperation)
 	return function(name: string, callback: () -> any)
 		local recording = ChangeHistoryService:TryBeginRecording(name)
 		if not recording then
@@ -43,46 +45,60 @@ local function changeHistoryServiceWrap(warnMessage: string, finishOperation: En
 	end
 end
 
-local function setUpWrapper()
-	defaultWrapper = changeHistoryServiceWrap("Plugin error when starting recording", Enum.FinishRecordingOperation.Commit)
+
+----- Main -----
+
+local function main()
+	Globals.defaultWrapper = changeHistoryServiceWrap("Plugin error when starting recording", Enum.FinishRecordingOperation.Commit)
 end
 
 
----------- Module functions ----------
+---------- Calling function ----------
+
+main()
+
+
+---------- Module ----------
+
+local ButtonFunctions = {}
+
+
+----- Module fields -----
+
+function ButtonFunctions.insertPieModule()
+	Globals.defaultWrapper("Insert pie module folder", PieTool.insertModuleFolder)
+end
 
 function ButtonFunctions.insertPiePackage()
-	defaultWrapper("Insert pie package", PieTool.insertPackage)
+	Globals.defaultWrapper("Insert pie package", PieTool.insertPackage)
 end
 
 function ButtonFunctions.setUpPieTool()
-	defaultWrapper("Set up pie tool", PieTool.setUp)
+	Globals.defaultWrapper("Set up pie tool container scripts", PieTool.setUpContainerScripts)
 end
 
 function ButtonFunctions.insertClassicPieTool()
-	defaultWrapper("Insert (bake) classic pie tool", PieTool.insertClassic)
+	Globals.defaultWrapper("Insert (bake) classic pie tool", PieTool.insertClassic)
 end
 
 function ButtonFunctions.insertBeginnerPieTool()
-	defaultWrapper("Insert (bake) beginner pie tool", PieTool.insertBeginner)
+	Globals.defaultWrapper("Insert (bake) beginner pie tool", PieTool.insertBeginner)
 end
 
 function ButtonFunctions.setUpMapKit()
-	defaultWrapper("Set up map kit", MapKit.setUp)
+	Globals.defaultWrapper("Set up map kit", MapKit.setUp)
 end
 
 function ButtonFunctions.insertMapKit()
-	defaultWrapper("Insert map kit", MapKit.insert)
+	Globals.defaultWrapper("Insert map kit", MapKit.insert)
 end
 
 function ButtonFunctions.insertAnimation()
-	defaultWrapper("Insert animation", DGAnimation.insert)
+	Globals.defaultWrapper("Insert animation", DGAnimation.insert)
 end
 
 
----------- Calling / connecting functions ----------
-
-setUpWrapper()
-
-
 ---------- Return module ----------
+
+table.freeze(ButtonFunctions)
 return ButtonFunctions

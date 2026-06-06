@@ -1,9 +1,9 @@
 --!strict
--- Pie Hiking Plugin
+
+-- Plugin Main
 
 
 ---------- Validate environment ----------
--- Validate the script's environment before running any code
 
 local RunService = game:GetService("RunService")
 
@@ -21,19 +21,23 @@ local MouseCursor = require(PluginScripts.MouseCursor)
 local StudioTheme = require(PluginScripts.StudioTheme)
 
 
----------- Instances ----------
+---------- Constants ----------
 
-local PluginFolder = script.Parent.Parent
+local Constants = {}
 
-local PieHikingToolbar = plugin:CreateToolbar("Pie Hiking")
-local PieHikingToolbarButton: PluginToolbarButton
+Constants.pluginFolder = script.Parent.Parent
 
-local PieHikingWidget: DockWidgetPluginGui
+Constants.pieHikingToolbar = plugin:CreateToolbar("Pie Hiking")
+Constants.pieHikingToolbarButton = Constants.pieHikingToolbar:CreateButton(
+	"Start Pie Hiking",
+	"Set up the pie tool or the map kit.",
+	"rbxassetid://17856554137"
+)
 
-local WidgetGuis = PluginFolder.WidgetGuis
-local PieHikingWidgetGui = WidgetGuis.PieHikingPluginGuis
+Constants.widgetGuis = Constants.pluginFolder.WidgetGuis
+Constants.pieHikingWidgetGui = Constants.widgetGuis.PieHikingPluginGuis
 
-local widgetInfo = DockWidgetPluginGuiInfo.new(
+Constants.widgetInfo = DockWidgetPluginGuiInfo.new(
 	Enum.InitialDockState.Float,
 	false,
 	true,
@@ -43,49 +47,58 @@ local widgetInfo = DockWidgetPluginGuiInfo.new(
 	200
 )
 
+Constants.pieHikingWidget = plugin:CreateDockWidgetPluginGuiAsync("Pie Hiking Widget", Constants.widgetInfo)
 
----------- Plugin event functions ----------
-
-local function onPieHikingToolbarButtonClicked()
-	PieHikingWidget.Enabled = not PieHikingWidget.Enabled
-end
-
-local function onPieHikingWidgetClosed()
-	PieHikingToolbarButton:SetActive(true)
-	PieHikingToolbarButton:SetActive(false)
-	PieHikingWidget.Enabled = false
-end
+table.freeze(Constants)
 
 
 ---------- Local functions ----------
 
-local function setUpPluginToolbar()
-	PieHikingToolbarButton = PieHikingToolbar:CreateButton(
-		"Start Pie Hiking",
-		"Set up the pie tool or the map kit.",
-		"rbxassetid://17856554137"
-	)
+local onPieHikingToolbarButtonClicked
+local onPieHikingWidgetClosed
 
-	PieHikingToolbarButton.Click:Connect(onPieHikingToolbarButtonClicked)
+local setUpPluginToolbar
+local setUpPluginWidgets
+local setUpPluginWidgetButtons
+local setUpPluginWidgetUis
+
+
+----- Plugin events -----
+
+onPieHikingToolbarButtonClicked = function()
+	Constants.pieHikingWidget.Enabled = not Constants.pieHikingWidget.Enabled
 end
 
-local function setUpPluginWidgets()
+onPieHikingWidgetClosed = function()
+	Constants.pieHikingToolbarButton:SetActive(true)
+	Constants.pieHikingToolbarButton:SetActive(false)
+	Constants.pieHikingWidget.Enabled = false
+end
+
+
+----- Set up plugin -----
+
+setUpPluginToolbar = function()
+	Constants.pieHikingToolbarButton.Click:Connect(onPieHikingToolbarButtonClicked)
+end
+
+setUpPluginWidgets = function()
 	-- Create widget
-	PieHikingWidget = plugin:CreateDockWidgetPluginGuiAsync("Pie Hiking Widget", widgetInfo)
-	PieHikingWidget.Title = "Pie Hiking"
-	PieHikingWidget.Name = "PieHikingPluginGui"
+	Constants.pieHikingWidget.Title = "Pie Hiking"
+	Constants.pieHikingWidget.Name = "PieHikingPluginGui"
 
 	-- Parent widget gui
-	PieHikingWidgetGui.Parent = PieHikingWidget
+	Constants.pieHikingWidgetGui.Parent = Constants.pieHikingWidget
 
 	-- Deactivate toolbar button when closing widget
-	PieHikingWidget:BindToClose(onPieHikingWidgetClosed)
+	Constants.pieHikingWidget:BindToClose(onPieHikingWidgetClosed)
 end
 
-local function setUpPluginWidgetButtons()
+setUpPluginWidgetButtons = function()
 	-- Pie button events
-	local scrollingFrame = PieHikingWidgetGui.ScrollingFrame
+	local scrollingFrame = Constants.pieHikingWidgetGui.ScrollingFrame
 	local pieFrame = scrollingFrame.PieFrame.Button_Frame
+	pieFrame.PieModuleInsertButton.MouseButton1Click:Connect(ButtonFunctions.insertPieModule)
 	pieFrame.PiePackageInsertButton.MouseButton1Click:Connect(ButtonFunctions.insertPiePackage)
 	pieFrame.PieToolSetUpButton.MouseButton1Click:Connect(ButtonFunctions.setUpPieTool)
 	pieFrame.PieToolClassicInsertButton.MouseButton1Click:Connect(ButtonFunctions.insertClassicPieTool)
@@ -101,22 +114,23 @@ local function setUpPluginWidgetButtons()
 	animationFrame.AnimationInsertButton.MouseButton1Click:Connect(ButtonFunctions.insertAnimation)
 end
 
-local function setUpPluginWidgetUis()
+setUpPluginWidgetUis = function()
 	-- Sync frame colors
 	StudioTheme.syncGuiColors({
-		PieHikingWidgetGui.ScrollingFrame,
+		Constants.pieHikingWidgetGui.ScrollingFrame,
 	})
 
 	-- Set up mouse cursors
 	MouseCursor.setPlugin(plugin)
 	local buttons = {
-		PieHikingWidgetGui.ScrollingFrame.PieFrame.Button_Frame.PiePackageInsertButton,
-		PieHikingWidgetGui.ScrollingFrame.PieFrame.Button_Frame.PieToolSetUpButton,
-		PieHikingWidgetGui.ScrollingFrame.PieFrame.Button_Frame.PieToolClassicInsertButton,
-		PieHikingWidgetGui.ScrollingFrame.PieFrame.Button_Frame.PieToolBeginnerInsertButton,
-		PieHikingWidgetGui.ScrollingFrame.MapKitFrame.Button_Frame.MapKitSetUpButton,
-		PieHikingWidgetGui.ScrollingFrame.MapKitFrame.Button_Frame.MapKitInsertButton,
-		PieHikingWidgetGui.ScrollingFrame.AnimationFrame.Button_Frame.AnimationInsertButton,
+		Constants.pieHikingWidgetGui.ScrollingFrame.PieFrame.Button_Frame.PieModuleInsertButton,
+		Constants.pieHikingWidgetGui.ScrollingFrame.PieFrame.Button_Frame.PiePackageInsertButton,
+		Constants.pieHikingWidgetGui.ScrollingFrame.PieFrame.Button_Frame.PieToolSetUpButton,
+		Constants.pieHikingWidgetGui.ScrollingFrame.PieFrame.Button_Frame.PieToolClassicInsertButton,
+		Constants.pieHikingWidgetGui.ScrollingFrame.PieFrame.Button_Frame.PieToolBeginnerInsertButton,
+		Constants.pieHikingWidgetGui.ScrollingFrame.MapKitFrame.Button_Frame.MapKitSetUpButton,
+		Constants.pieHikingWidgetGui.ScrollingFrame.MapKitFrame.Button_Frame.MapKitInsertButton,
+		Constants.pieHikingWidgetGui.ScrollingFrame.AnimationFrame.Button_Frame.AnimationInsertButton,
 	}
 	for _, object in buttons do
 		object.MouseEnter:Connect(function()
@@ -129,11 +143,9 @@ local function setUpPluginWidgetUis()
 end
 
 
----------- Event functions ----------
+----- Main -----
 
-
----------- Set up function ----------
-local function initSetUp()
+local function main()
 	setUpPluginToolbar()
 	setUpPluginWidgets()
 	setUpPluginWidgetButtons()
@@ -141,6 +153,6 @@ local function initSetUp()
 end
 
 
----------- Calling / connecting functions ----------
+---------- Calling function ----------
 
-initSetUp()
+main()

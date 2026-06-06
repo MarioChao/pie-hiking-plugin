@@ -3,6 +3,18 @@
 TODO:
 - Simplify code for activators (ex: touch, zone).
 
+## [v1.4.0] Heart pie v2.0.0 | 2026/06/06
+
+Migrated to Heart Pie v2.0.0.
+
+Added new button for inserting the pie module folder.
+
+Refactored `PieTool` to use `cloneReparentRecursive()` for setting up container scripts.
+
+Cleaned a few scripts.
+
+Removed wally.
+
 ## [v1.3.9] Pie package update | 2026/03/28
 
 Migrated to Heart Pie package:

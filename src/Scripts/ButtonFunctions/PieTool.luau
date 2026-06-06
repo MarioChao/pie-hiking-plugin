@@ -1,6 +1,6 @@
 --!strict
 
--- Pie Tool Module
+-- Pie Tool
 
 
 ---------- Services ----------
@@ -12,6 +12,11 @@ local ServerStorage = game:GetService("ServerStorage")
 local StarterPack = game:GetService("StarterPack")
 
 
+---------- Types ----------
+
+type FilePath = {[string]: FilePath}
+
+
 ---------- Constants ----------
 
 local Constants = {}
@@ -19,12 +24,15 @@ local Constants = {}
 Constants.pluginFolder = script.Parent.Parent.Parent
 
 Constants.assets = Constants.pluginFolder:FindFirstChild("Assets")
-Constants.heartPie_folder = Constants.assets.HeartPie_Package
-Constants.heartPie_tool = Constants.heartPie_folder.HeartPie
-Constants.containerScripts = Constants.heartPie_folder["ContainerScripts (see ReadMe)"]
-Constants.containerSetUp = Constants.heartPie_folder.ContainerSetUp
+Constants.heartPie_moduleFolder = Constants.assets.HeartPie_Module
+Constants._heartPieModule = Constants.heartPie_moduleFolder.MainModule
+Constants.heartPie_package = Constants._heartPieModule.HeartPie_Package
+Constants.heartPie_tool = Constants.heartPie_package.HeartPie
+Constants.containerScripts = Constants.heartPie_package.ContainerScripts
+Constants.containerSetUp = Constants.heartPie_package.ContainerSetUp
 
 Constants.strings = {
+	moduleFolderName = "HeartPie_Module",
 	packageName = "HeartPie_Package",
 	classicPieName = "Classic Heart Pie (from plugin)",
 	beginnerPieName = "Beginner Heart Pie (from plugin)",
@@ -34,17 +42,24 @@ table.freeze(Constants.strings)
 table.freeze(Constants)
 
 
----------- Globals ----------
-
-local Globals = {}
-
-Globals.heartPie_tool = Constants.heartPie_tool:Clone()
-Globals.containerScripts = Constants.containerScripts:Clone()
-
-
 ---------- Local functions ----------
 
-local function removeDupes(parent: Instance, childName: string)
+local removeDupes
+local replaceIfNotFound
+local replaceWithNew
+local cloneReparentRecursive
+
+local setUpPieToolContainers
+
+local insertPieModuleFolder
+local insertPiePackage
+local insertClassicPieTool
+local insertBeginnerPieTool
+
+
+----- Replacement -----
+
+removeDupes = function(parent: Instance, childName: string)
 	while true do
 		local dupe = parent:FindFirstChild(childName)
 		if not dupe then
@@ -54,7 +69,7 @@ local function removeDupes(parent: Instance, childName: string)
 	end
 end
 
-local function replaceIfNotFound(parent: Instance, child: Instance)
+replaceIfNotFound = function(parent: Instance, child: Instance)
 	local addedInstance = nil
 	if not parent:FindFirstChild(child.Name) then
 		local newObject = child:Clone()
@@ -64,109 +79,148 @@ local function replaceIfNotFound(parent: Instance, child: Instance)
 	return addedInstance
 end
 
-local function replaceWithNew(parent: Instance, child: Instance)
+replaceWithNew = function(parent: Instance, child: Instance)
 	removeDupes(parent, child.Name)
 	local newObject = child:Clone()
 	newObject.Parent = parent
 	return newObject
 end
 
+cloneReparentRecursive = function(oldParent: Instance, newParent: Instance, doNotReplacePaths: FilePath): {Instance}
+	local addedInstances = {}
+	for _, child in oldParent:GetChildren() do
+		-- Check do not replace
+		if doNotReplacePaths[child.Name] then
+			-- Replace if not found
+			local replacedObject = replaceIfNotFound(newParent, child)
+			table.insert(addedInstances, replacedObject)
 
----------- Set up functions ----------
+			-- Reparent recursive
+			local newParentChild = newParent:FindFirstChild(child.Name) or replacedObject
+			local tempInstances = cloneReparentRecursive(child, newParentChild, doNotReplacePaths[child.Name])
+			table.move(tempInstances, 1, #tempInstances, #addedInstances + 1, addedInstances)
+			continue
+		end
 
-local function insertPiePackage(): {Instance}
-	if ServerStorage:FindFirstChild(Constants.strings.packageName) then
-		warn(`A {Constants.strings.packageName} already exists in ServerStorage.`)
+		-- Replace
+		table.insert(addedInstances, replaceWithNew(newParent, child))
+	end
+	return addedInstances
+end
+
+
+----- Set up -----
+
+setUpPieToolContainers = function(): {Instance}
+	local addedInstances = {}
+	local tempInstances: {Instance}
+	local defaultContainerScripts = Constants.containerScripts
+
+	-- Validate container scripts
+	local canSetUp = (
+		(defaultContainerScripts and defaultContainerScripts:IsA("Folder"))
+		and defaultContainerScripts:FindFirstChild("ReplicatedStorage")
+	)
+	if not canSetUp then
+		warn("Set up error: can't set up heart pie!")
 		return {}
 	end
 
-	local newPackageFolder = Constants.heartPie_folder:Clone()
+	-- Clone container scripts
+	local containerScripts = defaultContainerScripts:Clone()
+
+	-- Replicated storage
+	tempInstances = cloneReparentRecursive(containerScripts.ReplicatedStorage, ReplicatedStorage, {
+		PieHiking_SharedStorage = {
+			EffectModules = {
+				Presets = {
+					CustomHitEffectsObjectValue = {},
+				},
+			},
+			SoundModules = {
+				Presets = {
+					CustomSoundEffectsObjectValue = {},
+				},
+			},
+		},
+	})
+	table.move(tempInstances, 1, #tempInstances, #addedInstances + 1, addedInstances)
+
+	-- Server script service
+	tempInstances = cloneReparentRecursive(containerScripts.ServerScriptService, ServerScriptService, {
+		PieHiking_ServerScripts = {
+			SkinModules = {
+				Presets = {
+					CustomConditionalPieSkinsFolderObjectValue = {},
+					CustomStarterPieSkinsFolderObjectValue = {},
+					CustomPieSkinConditionsObjectValue = {},
+				},
+			},
+		},
+	})
+	table.move(tempInstances, 1, #tempInstances, #addedInstances + 1, addedInstances)
+
+	return addedInstances
+end
+
+
+----- Insert -----
+
+insertPieModuleFolder = function(): {Instance}
+	if ServerStorage:FindFirstChild(Constants.strings.moduleFolderName) then
+		warn(`A '{Constants.strings.moduleFolderName}' already exists in ServerStorage.`)
+		return {}
+	end
+
+	local newPackageFolder = Constants.heartPie_moduleFolder:Clone()
+	newPackageFolder.Name = Constants.strings.moduleFolderName
+	newPackageFolder.Parent = ServerStorage
+
+	return {newPackageFolder}
+end
+
+insertPiePackage = function(): {Instance}
+	if ServerStorage:FindFirstChild(Constants.strings.packageName) then
+		warn(`A '{Constants.strings.packageName}' already exists in ServerStorage.`)
+		return {}
+	end
+
+	local newPackageFolder = Constants.heartPie_package:Clone()
 	newPackageFolder.Name = Constants.strings.packageName
 	newPackageFolder.Parent = ServerStorage
 
 	return {newPackageFolder}
 end
 
-local function setUpPieToolContainers(): {Instance}
-	local addedInstances = {}
-
-	local canSetUp = (
-		(Globals.containerScripts and Globals.containerScripts:IsA("Folder"))
-		and Globals.containerScripts:FindFirstChild("ReplicatedStorage")
-	)
-	if not canSetUp then
-		warn("Set up error: can't set up heart pie!")
-	end
-
-	for _, object in Globals.containerScripts.ReplicatedStorage:GetChildren() do
-		-- Special case
-		if object.Name == "PieHikingModules" then
-			table.insert(addedInstances, replaceIfNotFound(ReplicatedStorage, object))
-			for _, object_2 in object:GetChildren() do
-				-- Special case
-				if object_2.Name == "PieHitEffects" or object_2.Name == "EffectsList" then
-					local newReplaced = replaceIfNotFound(ReplicatedStorage[object.Name], object_2)
-					table.insert(addedInstances, newReplaced)
-					continue
-				end
-
-				local newObject = replaceWithNew(ReplicatedStorage[object.Name], object_2)
-				table.insert(addedInstances, newObject)
-			end
-			continue
-		end
-		local newObject = replaceWithNew(ReplicatedStorage, object)
-		table.insert(addedInstances, newObject)
-	end
-	for _, object in Globals.containerScripts.ServerScriptService:GetChildren() do
-		local newObject = replaceWithNew(ServerScriptService, object)
-		table.insert(addedInstances, newObject)
-	end
-	for _, object in Globals.containerScripts.ServerStorage:GetChildren() do
-		-- Special case
-		if object.Name == "PieHikingServerStorage" then
-			table.insert(addedInstances, replaceIfNotFound(ServerStorage, object))
-			for _, object_2 in object:GetChildren() do
-				-- Special case
-				if object_2.Name == "PieSkins" or object_2.Name == "PieSkinConditions" then
-					local newReplaced = replaceIfNotFound(ServerStorage[object.Name], object_2)
-					table.insert(addedInstances, newReplaced)
-					continue
-				end
-
-				local newObject = replaceWithNew(ServerStorage[object.Name], object_2)
-				table.insert(addedInstances, newObject)
-			end
-			continue
-		end
-
-		local newObject = replaceWithNew(ServerStorage, object)
-		table.insert(addedInstances, newObject)
-	end
-
-	return addedInstances
-end
-
-local function insertClassicPieTool(): {Instance}
+insertClassicPieTool = function(): {Instance}
 	if StarterPack:FindFirstChild(Constants.strings.classicPieName) then
-		warn(`A {Constants.strings.classicPieName} already exists in StarterPack.`)
+		warn(`A '{Constants.strings.classicPieName}' already exists in StarterPack.`)
 		return {}
 	end
 
-	local newHeartPie = Globals.heartPie_tool:Clone()
+	local newHPMModule = Constants._heartPieModule:Clone()
+
+	local newHeartPie = newHPMModule.HeartPie_Package.HeartPie:Clone()
 	newHeartPie.Name = Constants.strings.classicPieName
 	newHeartPie.Parent = StarterPack
 
 	return {newHeartPie}
 end
 
-local function insertBeginnerPieTool(): {Instance}
+insertBeginnerPieTool = function(): {Instance}
 	if StarterPack:FindFirstChild(Constants.strings.beginnerPieName) then
-		warn(`A {Constants.strings.beginnerPieName} already exists in StarterPack.`)
+		warn(`A '{Constants.strings.beginnerPieName}' already exists in StarterPack.`)
 		return {}
 	end
 
-	local newHeartPie = Globals.heartPie_tool:Clone()
+	local newHPMModule = Constants._heartPieModule:Clone()
+	local hpm = require(newHPMModule) :: any
+	local toolConfig = hpm.getToolConfig()
+	toolConfig:SetAttribute("CanCollideThrower", false)
+	toolConfig:SetAttribute("LaunchOffsetStuds", 0)
+	toolConfig:SetAttribute("LaunchVelocity", 95)
+
+	local newHeartPie = newHPMModule.HeartPie_Package.HeartPie:Clone()
 	newHeartPie.Name = Constants.strings.beginnerPieName
 	newHeartPie:SetAttribute("CanCollideThrower", false)
 	newHeartPie:SetAttribute("LaunchOffsetStuds", 0)
@@ -174,14 +228,6 @@ local function insertBeginnerPieTool(): {Instance}
 	newHeartPie.Parent = StarterPack
 
 	return {newHeartPie}
-end
-
-local function refreshPieTool()
-	Globals.heartPie_tool:Destroy()
-	Globals.heartPie_tool = Constants.heartPie_tool:Clone()
-
-	Globals.containerScripts:Destroy()
-	Globals.containerScripts = Constants.containerScripts:Clone()
 end
 
 
@@ -192,26 +238,27 @@ local Module = {}
 
 ----- Module fields -----
 
+function Module.insertModuleFolder()
+	local addedInstances = insertPieModuleFolder()
+	Selection:Set(addedInstances)
+end
+
 function Module.insertPackage()
-	refreshPieTool()
 	local addedInstances = insertPiePackage()
 	Selection:Set(addedInstances)
 end
 
-function Module.setUp()
-	refreshPieTool()
+function Module.setUpContainerScripts()
 	local addedInstances = setUpPieToolContainers()
 	Selection:Set(addedInstances)
 end
 
 function Module.insertClassic()
-	refreshPieTool()
 	local addedInstances = insertClassicPieTool()
 	Selection:Set(addedInstances)
 end
 
 function Module.insertBeginner()
-	refreshPieTool()
 	local addedInstances = insertBeginnerPieTool()
 	Selection:Set(addedInstances)
 end
