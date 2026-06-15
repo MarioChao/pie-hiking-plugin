@@ -3,6 +3,10 @@
 TODO:
 - Simplify code for activators (ex: touch, zone).
 
+## [v1.4.1] Heart pie v2.0.1 | 2026/06/15
+
+Migrated pie tool to v2.0.1.
+
 ## [v1.4.0] Heart pie v2.0.0 | 2026/06/06
 
 Migrated to Heart Pie v2.0.0.
