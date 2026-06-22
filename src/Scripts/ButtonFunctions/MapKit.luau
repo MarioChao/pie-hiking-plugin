@@ -1,9 +1,6 @@
 --!strict
--- Map Kit Module
 
-
----------- Module ----------
-local Module = {}
+-- Map Kit
 
 
 ---------- Services ----------
@@ -11,21 +8,40 @@ local Module = {}
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Selection = game:GetService("Selection")
 local ServerScriptService = game:GetService("ServerScriptService")
-local SoundService = game:GetService("SoundService")
-local StarterPlayer = game:GetService("StarterPlayer")
 
 
----------- Instances ----------
+---------- Types ----------
 
-local PluginFolder = script.Parent.Parent.Parent
+type FilePath = {[string]: FilePath}
 
-local KitGameInstances = PluginFolder.KitGameInstances
-local PieHikingMapKit: Folder
+
+---------- Constants ----------
+
+local Constants = {}
+
+Constants.pluginFolder = script.Parent.Parent.Parent
+Constants.kitGameInstances = Constants.pluginFolder.KitGameInstances
+
+table.freeze(Constants)
 
 
 ---------- Local functions ----------
 
-local function removeDupes(parent: Instance, childName: string)
+local removeDupes
+local replaceIfNotFound
+local replaceWithNew
+local cloneReparentRecursive
+
+local enableDescendantScripts
+local setUpMapKitContainers
+local setUpMapKitProperties
+local insertMapKit
+local getRefreshedMapKit
+
+
+----- Replacement -----
+
+removeDupes = function(parent: Instance, childName: string)
 	while true do
 		local dupe = parent:FindFirstChild(childName)
 		if not dupe then
@@ -35,7 +51,7 @@ local function removeDupes(parent: Instance, childName: string)
 	end
 end
 
-local function replaceIfNotFound(parent: Instance, child: Instance): Instance?
+replaceIfNotFound = function(parent: Instance, child: Instance)
 	local addedInstance = nil
 	if not parent:FindFirstChild(child.Name) then
 		local newObject = child:Clone()
@@ -45,14 +61,39 @@ local function replaceIfNotFound(parent: Instance, child: Instance): Instance?
 	return addedInstance
 end
 
-local function replaceWithNew(parent: Instance, child: Instance)
+replaceWithNew = function(parent: Instance, child: Instance)
 	removeDupes(parent, child.Name)
 	local newObject = child:Clone()
 	newObject.Parent = parent
 	return newObject
 end
 
-local function enableDescendantScripts(parent: Instance)
+cloneReparentRecursive = function(oldParent: Instance, newParent: Instance, doNotReplacePaths: FilePath): {Instance}
+	local addedInstances = {}
+	for _, child in oldParent:GetChildren() do
+		-- Check do not replace
+		if doNotReplacePaths[child.Name] then
+			-- Replace if not found
+			local replacedObject = replaceIfNotFound(newParent, child)
+			table.insert(addedInstances, replacedObject)
+
+			-- Reparent recursive
+			local newParentChild = newParent:FindFirstChild(child.Name) or replacedObject
+			local tempInstances = cloneReparentRecursive(child, newParentChild, doNotReplacePaths[child.Name])
+			table.move(tempInstances, 1, #tempInstances, #addedInstances + 1, addedInstances)
+			continue
+		end
+
+		-- Replace
+		table.insert(addedInstances, replaceWithNew(newParent, child))
+	end
+	return addedInstances
+end
+
+
+----- Set up -----
+
+enableDescendantScripts = function(parent: Instance)
 	for _, object in parent:GetDescendants() do
 		-- Validate script
 		if not object:IsA("Script") then
@@ -70,78 +111,58 @@ local function enableDescendantScripts(parent: Instance)
 	end
 end
 
-local function setUpMapKitContainers(): {Instance}
+setUpMapKitContainers = function(): {Instance}
 	local addedInstances = {}
+	local tempInstances: {Instance}
 
-	for _, object in KitGameInstances.ReplicatedStorage:GetChildren() do
-		if object.Name == "PieMapKit_SharedStorage" then
-			local newParentObject = replaceIfNotFound(ReplicatedStorage, object)
-			if newParentObject then
-				enableDescendantScripts(newParentObject)
-				table.insert(addedInstances, newParentObject)
-			end
-			for _, object_2 in object:GetChildren() do
-				if string.find(object_2.Name, "Custom_", 0, true) then
-					local newReplaced = replaceIfNotFound(ReplicatedStorage[object.Name], object_2)
-					if newReplaced then
-						enableDescendantScripts(newReplaced)
-						table.insert(addedInstances, newReplaced)
-					end
-				else
-					local newObject = replaceWithNew(ReplicatedStorage[object.Name], object_2)
-					enableDescendantScripts(newObject)
-					table.insert(addedInstances, newObject)
-				end
-			end
-		else
-			local newObject = replaceWithNew(ReplicatedStorage, object)
-			enableDescendantScripts(newObject)
-			table.insert(addedInstances, newObject)
-		end
+	-- Clone container scripts
+	local containerScripts = Constants.kitGameInstances:Clone()
+
+	-- Replicated storage
+	tempInstances = cloneReparentRecursive(containerScripts.ReplicatedStorage, ReplicatedStorage, {
+		PieMapKit_SharedStorage = {
+			Custom_DefaultMusicSound = {},
+		},
+	})
+	table.move(tempInstances, 1, #tempInstances, #addedInstances + 1, addedInstances)
+	for _, object in tempInstances do
+		enableDescendantScripts(object)
 	end
-	for _, object in KitGameInstances.ServerScriptService:GetChildren() do
-		removeDupes(ServerScriptService, object.Name)
-		local newObject = object:Clone()
-		enableDescendantScripts(newObject)
-		newObject.Parent = ServerScriptService
-		table.insert(addedInstances, newObject)
-	end
-	for _, object in KitGameInstances.StarterPlayerScripts:GetChildren() do
-		removeDupes(StarterPlayer.StarterPlayerScripts, object.Name)
-		local newObject = object:Clone()
-		enableDescendantScripts(newObject)
-		newObject.Parent = StarterPlayer.StarterPlayerScripts
-		table.insert(addedInstances, newObject)
-	end
-	for _, object in KitGameInstances.SoundService:GetChildren() do
-		removeDupes(SoundService, object.Name)
-		local newObject = object:Clone()
-		enableDescendantScripts(newObject)
-		newObject.Parent = SoundService
-		table.insert(addedInstances, newObject)
+
+	-- Server script service
+	tempInstances = cloneReparentRecursive(containerScripts.ServerScriptService, ServerScriptService, {})
+	table.move(tempInstances, 1, #tempInstances, #addedInstances + 1, addedInstances)
+	for _, object in tempInstances do
+		enableDescendantScripts(object)
 	end
 
 	return addedInstances
 end
 
-local function setUpMapKitProperties()
+setUpMapKitProperties = function()
 	warn("If you haven't, please enable TouchesUseCollisionGroups in Workspace!")
 end
 
-local function insertMapKit(): {Instance}
-	local newKit: typeof(PieHikingMapKit) = PieHikingMapKit:Clone()
+insertMapKit = function(mapKit: Instance): {Instance}
+	local newKit = mapKit:Clone()
 	newKit.Parent = workspace
 
 	return {newKit}
 end
 
-local function refreshMapKit()
-	PieHikingMapKit = game:GetObjects("rbxassetid://18722872073")[1]
-	PieHikingMapKit.Name = `Pie Hiking Map Kit (from plugin)`
+getRefreshedMapKit = function()
+	local mapKit = game:GetObjects("rbxassetid://18722872073")[1]
+	mapKit.Name = `Pie Hiking Map Kit (from plugin)`
+	return mapKit
 end
 
 
----------- Module functions ----------
+---------- Module ----------
+
+local Module = {}
+
+
+----- Module functions -----
 
 function Module.setUp()
 	local addedInstances = setUpMapKitContainers()
@@ -150,11 +171,13 @@ function Module.setUp()
 end
 
 function Module.insert()
-	refreshMapKit()
-	local addedInstances = insertMapKit()
+	local mapKit = getRefreshedMapKit()
+	local addedInstances = insertMapKit(mapKit)
 	Selection:Set(addedInstances)
 end
 
 
 ---------- Return module ----------
+
+table.freeze(Module)
 return Module

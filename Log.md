@@ -3,6 +3,28 @@
 TODO:
 - Simplify code for activators (ex: touch, zone).
 
+## [v1.4.2] Heart pie v2.0.2 + Refactored map kit | 2026/06/22
+
+Migrated pie tool to v2.0.2.
+
+Renamed `PieMapKitScripts` to `PieMapKit_ServerScripts`.
+
+Refactored map kit audio:
+- Renamed `PieMapKit_Audio` to `MapKit_Audio`.
+- Moved it from `SoundService` to `ReplicatedStorage > PieMapKit_SharedStorage`.
+
+Refactored map kit player scripts:
+- Renamed `PieMapKit_PlayerScripts` to `MapKit_PlayerScripts`.
+- Moved it from `StarterPlayerScripts` to `ReplicatedStorage > PieMapKit_SharedStorage`.
+
+Renamed other shared storage instances:
+- Renamed `PieMapKitModules` to `MapKit_Modules`.
+- Renamed `PieMapKitEvents` to `MapKit_Events`.
+
+Increased delay for hike checkpoints from 1 `RunService` heartbeat to 0.3 seconds.
+
+Implemented wally for [UIUtil](https://wally.run/package/mariochao/ui-util).
+
 ## [v1.4.1] Heart pie v2.0.1 | 2026/06/15
 
 Migrated pie tool to v2.0.1.

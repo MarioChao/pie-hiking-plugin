@@ -110,8 +110,8 @@ local function onCharacterAdded(character: Model, player: Player)
 		return
 	end
 
-	-- Delay a bit to allow default spawn position
-	RunService.Heartbeat:Wait()
+	-- Delay a bit to allow Roblox default spawn position to process
+	task.wait(0.3)
 
 	-- Move player to checkpoint
 	local checkpointCFrame = checkpointPart.CFrame

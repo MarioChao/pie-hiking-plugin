@@ -1,0 +1,15 @@
+[package]
+name = "mariochao/pie-hiking-plugin"
+description = "Plugin kit with everything you need to pie hike."
+
+version = "0.0.0"
+license = "MIT"
+authors = ["Mario Chao"]
+realm = "shared"
+registry = "https://github.com/UpliftGames/wally-index"
+repository = "https://github.com/MarioChao/pie-hiking-plugin"
+
+private = true
+
+[dependencies]
+UIUtil = "mariochao/ui-util@0.0.1"

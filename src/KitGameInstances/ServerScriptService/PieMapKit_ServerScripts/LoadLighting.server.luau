@@ -27,8 +27,8 @@ local UpdateLighting = require(LightingModules.UpdateLighting)
 
 ---------- Instances ----------
 
-local PieMapKitEvents = PieMapKit_SharedStorage:FindFirstChild("PieMapKitEvents")
-local LightingBindable = PieMapKitEvents.LightingBindable
+local MapKit_Events = PieMapKit_SharedStorage:FindFirstChild("MapKit_Events")
+local LightingBindable = MapKit_Events.LightingBindable
 
 
 ---------- Local functions ----------

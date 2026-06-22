@@ -1,0 +1,27 @@
+{
+	"className": "Folder",
+	"children": [
+		{
+			"className": "AudioDeviceOutput",
+			"attributes": {
+				"Rojo_Id": "PieMapKit_AudioDeviceOutput"
+			}
+		},
+		{
+			"className": "AudioPlayer",
+			"properties": {
+				"Looping": true
+			},
+			"attributes": {
+				"Rojo_Id": "PieMapKit_AudioPlayer"
+			}
+		},
+		{
+			"className": "Wire",
+			"attributes": {
+				"Rojo_Target_SourceInstance": "PieMapKit_AudioPlayer",
+				"Rojo_Target_TargetInstance": "PieMapKit_AudioDeviceOutput"
+			}
+		}
+	]
+}

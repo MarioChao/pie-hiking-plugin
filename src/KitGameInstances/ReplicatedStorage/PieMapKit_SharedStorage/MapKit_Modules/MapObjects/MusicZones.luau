@@ -40,8 +40,8 @@ if RunService:IsClient() then
 	Constants.localPlayer = Players.LocalPlayer or Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
 end
 
-Constants.pieMapKitEvents = PieMapKit_SharedStorage:WaitForChild("PieMapKitEvents")
-Constants.musicBindable = Constants.pieMapKitEvents:WaitForChild("MusicBindable")
+Constants.mapKit_events = PieMapKit_SharedStorage:WaitForChild("MapKit_Events")
+Constants.musicBindable = Constants.mapKit_events:WaitForChild("MusicBindable")
 
 table.freeze(Constants)
 

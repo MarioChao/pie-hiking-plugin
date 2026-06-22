@@ -1,0 +1,12 @@
+{
+    "tree": {
+        "$path": "../../../Packages",
+
+        "InstanceTween": {
+            "$path": "InstanceTween"
+        },
+        "SpatialQuery": {
+            "$path": "SpatialQuery"
+        }
+    }
+}

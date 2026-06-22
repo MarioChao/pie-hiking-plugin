@@ -25,9 +25,9 @@ type DamageBrickAttributes = {
 
 ---------- Instances ----------
 
-local PieMapKitEvents = PieMapKit_SharedStorage:WaitForChild("PieMapKitEvents")
-local DamageBindable = PieMapKitEvents.DamageBindable
-local DamageRemote = PieMapKitEvents.DamageRemote
+local MapKit_Events = PieMapKit_SharedStorage:WaitForChild("MapKit_Events")
+local DamageBindable = MapKit_Events.DamageBindable
+local DamageRemote = MapKit_Events.DamageRemote
 
 
 ---------- Variables ----------

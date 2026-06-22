@@ -22,9 +22,9 @@ local PieMapKit_SharedStorage = ReplicatedStorage:FindFirstChild("PieMapKit_Shar
 
 ---------- Imports ----------
 
-local PieMapKitModules = PieMapKit_SharedStorage:WaitForChild("PieMapKitModules")
-local DreamMaps = require(PieMapKitModules.DreamMaps)
-require(PieMapKitModules.MapObjects)
+local MapKit_Modules = PieMapKit_SharedStorage:WaitForChild("MapKit_Modules")
+local DreamMaps = require(MapKit_Modules.DreamMaps)
+require(MapKit_Modules.MapObjects)
 
 
 ---------- Types ----------
@@ -32,10 +32,10 @@ require(PieMapKitModules.MapObjects)
 
 ---------- Instances ----------
 
-local PieMapKitEvents = PieMapKit_SharedStorage:WaitForChild("PieMapKitEvents")
-local LoadDreamBindable = PieMapKitEvents.LoadDreamBindable
-local LoadDreamRemote = PieMapKitEvents.LoadDreamRemote
-local LightingBindable = PieMapKitEvents.LightingBindable
+local MapKit_Events = PieMapKit_SharedStorage:WaitForChild("MapKit_Events")
+local LoadDreamBindable = MapKit_Events.LoadDreamBindable
+local LoadDreamRemote = MapKit_Events.LoadDreamRemote
+local LightingBindable = MapKit_Events.LightingBindable
 
 local DefaultDreamValue: ObjectValue? = workspace:FindFirstChild("_DefaultDreamValue", true)
 local DefaultDream = DefaultDreamValue and DefaultDreamValue.Value

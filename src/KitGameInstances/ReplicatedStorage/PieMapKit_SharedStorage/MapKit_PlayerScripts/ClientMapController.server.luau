@@ -1,12 +1,12 @@
 --!strict
--- Client Map Controller Script
+
+-- Client Map Controller
 
 
 ---------- Validate container ----------
--- Validate the script's container before running any code
 
--- For certain client scripts
-if not script:FindFirstAncestorWhichIsA("PlayerScripts") then
+-- Replicated storage
+if not script:FindFirstAncestorWhichIsA("ReplicatedStorage") then
 	return
 end
 
@@ -21,8 +21,8 @@ local PieMapKit_SharedStorage = ReplicatedStorage:WaitForChild("PieMapKit_Shared
 
 ---------- Imports ----------
 
-local PieMapKitModules = PieMapKit_SharedStorage:WaitForChild("PieMapKitModules")
-require(PieMapKitModules.MapObjects)
+local MapKit_Modules = PieMapKit_SharedStorage:WaitForChild("MapKit_Modules")
+require(MapKit_Modules.MapObjects)
 
 
 ---------- Types ----------
@@ -30,8 +30,8 @@ require(PieMapKitModules.MapObjects)
 
 ---------- Instances ----------
 
-local PieMapKitEvents = PieMapKit_SharedStorage:WaitForChild("PieMapKitEvents")
-local LoadDreamRemote = PieMapKitEvents.LoadDreamRemote
+local MapKit_Events = PieMapKit_SharedStorage:WaitForChild("MapKit_Events")
+local LoadDreamRemote = MapKit_Events.LoadDreamRemote
 
 
 ---------- Variables ----------

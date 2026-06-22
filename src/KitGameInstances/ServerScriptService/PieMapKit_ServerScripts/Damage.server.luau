@@ -20,9 +20,9 @@ local PieMapKit_SharedStorage = ReplicatedStorage:FindFirstChild("PieMapKit_Shar
 
 ---------- Instances ----------
 
-local PieMapKitEvents = PieMapKit_SharedStorage.PieMapKitEvents
-local DamageBindable = PieMapKitEvents.DamageBindable
-local DamageRemote = PieMapKitEvents.DamageRemote
+local MapKit_Events = PieMapKit_SharedStorage.MapKit_Events
+local DamageBindable = MapKit_Events.DamageBindable
+local DamageRemote = MapKit_Events.DamageRemote
 
 
 ---------- Constants ----------

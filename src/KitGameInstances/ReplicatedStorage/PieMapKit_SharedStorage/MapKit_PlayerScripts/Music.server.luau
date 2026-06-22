@@ -1,12 +1,12 @@
 --!strict
--- Load Lighting Script
+
+-- Music
 
 
 ---------- Validate container ----------
--- Validate the script's container before running any code
 
--- For certain client scripts
-if not script:FindFirstAncestorWhichIsA("PlayerScripts") then
+-- Replicated storage
+if not script:FindFirstAncestorWhichIsA("ReplicatedStorage") then
 	return
 end
 
@@ -15,13 +15,6 @@ end
 
 local ReplicatedStorage = script.Parent.Parent.Parent:FindFirstChild("ReplicatedStorage") or game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
-local SoundService = script.Parent.Parent.Parent:FindFirstChild("SoundService") or game:GetService("SoundService")
-
-local PieMapKit_SharedStorage = ReplicatedStorage:WaitForChild("PieMapKit_SharedStorage")
-local PieMapKit_Audio = SoundService:WaitForChild("PieMapKit_Audio")
-
-
----------- Imports ----------
 
 
 ---------- Types ----------
@@ -44,10 +37,13 @@ type AudioPlayingState = "FadeOut" | "FadeIn" | "Playing"
 
 ---------- Instances ----------
 
-local PieMapKitEvents = PieMapKit_SharedStorage:WaitForChild("PieMapKitEvents")
-local MusicBindable = PieMapKitEvents:WaitForChild("MusicBindable")
+local PieMapKit_SharedStorage = ReplicatedStorage:WaitForChild("PieMapKit_SharedStorage")
+local MapKit_Audio = PieMapKit_SharedStorage:WaitForChild("MapKit_Audio")
 
-local AudioPlayer = PieMapKit_Audio:WaitForChild("AudioPlayer")
+local MapKit_Events = PieMapKit_SharedStorage:WaitForChild("MapKit_Events")
+local MusicBindable = MapKit_Events:WaitForChild("MusicBindable")
+
+local AudioPlayer = MapKit_Audio:WaitForChild("AudioPlayer")
 
 
 ---------- Variables ----------

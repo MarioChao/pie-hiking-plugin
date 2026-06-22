@@ -1,13 +1,12 @@
 --!strict
 
--- Client Collision Script
+-- Client Collision Group
 
 
 ---------- Validate container ----------
--- Validate the script's container before running any code
 
--- For certain client scripts
-if not script:FindFirstAncestorWhichIsA("PlayerScripts") then
+-- Replicated storage
+if not script:FindFirstAncestorWhichIsA("ReplicatedStorage") then
 	return
 end
 

@@ -24,8 +24,8 @@ type BurnBrickAttributes = {
 
 ---------- Instances ----------
 
-local PieMapKitEvents = PieMapKit_SharedStorage:WaitForChild("PieMapKitEvents")
-local BurnPieRemote = PieMapKitEvents.BurnPieRemote
+local MapKit_Events = PieMapKit_SharedStorage:WaitForChild("MapKit_Events")
+local BurnPieRemote = MapKit_Events.BurnPieRemote
 
 
 ---------- Variables ----------
