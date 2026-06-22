@@ -31,7 +31,10 @@ Constants.heartPie_tool = Constants.heartPie_package.HeartPie
 Constants.containerScripts = Constants.heartPie_package.ContainerScripts
 Constants.containerSetUp = Constants.heartPie_package.ContainerSetUp
 
+Constants.heartPie_customKit = Constants.assets.HeartPie_CustomKit
+
 Constants.strings = {
+	customKitName = "HeartPie_CustomKit",
 	moduleFolderName = "HeartPie_Module",
 	packageName = "HeartPie_Package",
 	classicPieName = "Classic Heart Pie (from plugin)",
@@ -52,7 +55,7 @@ local cloneReparentRecursive
 local setUpPieToolContainers
 
 local insertPieModuleFolder
-local insertPiePackage
+local insertPieCustomKit
 local insertClassicPieTool
 local insertBeginnerPieTool
 
@@ -172,24 +175,24 @@ insertPieModuleFolder = function(): {Instance}
 		return {}
 	end
 
-	local newPackageFolder = Constants.heartPie_moduleFolder:Clone()
-	newPackageFolder.Name = Constants.strings.moduleFolderName
-	newPackageFolder.Parent = ServerStorage
+	local newModuleFolder = Constants.heartPie_moduleFolder:Clone()
+	newModuleFolder.Name = Constants.strings.moduleFolderName
+	newModuleFolder.Parent = ServerStorage
 
-	return {newPackageFolder}
+	return {newModuleFolder}
 end
 
-insertPiePackage = function(): {Instance}
-	if ServerStorage:FindFirstChild(Constants.strings.packageName) then
-		warn(`A '{Constants.strings.packageName}' already exists in ServerStorage.`)
+insertPieCustomKit = function(): {Instance}
+	if workspace:FindFirstChild(Constants.strings.customKitName) then
+		warn(`A '{Constants.strings.customKitName}' already exists in Workspace.`)
 		return {}
 	end
 
-	local newPackageFolder = Constants.heartPie_package:Clone()
-	newPackageFolder.Name = Constants.strings.packageName
-	newPackageFolder.Parent = ServerStorage
+	local newCustomKit = Constants.heartPie_customKit:Clone()
+	newCustomKit.Name = Constants.strings.customKitName
+	newCustomKit.Parent = workspace
 
-	return {newPackageFolder}
+	return {newCustomKit}
 end
 
 insertClassicPieTool = function(): {Instance}
@@ -243,8 +246,8 @@ function Module.insertModuleFolder()
 	Selection:Set(addedInstances)
 end
 
-function Module.insertPackage()
-	local addedInstances = insertPiePackage()
+function Module.insertCustomKit()
+	local addedInstances = insertPieCustomKit()
 	Selection:Set(addedInstances)
 end
 

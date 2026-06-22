@@ -69,8 +69,8 @@ function ButtonFunctions.insertPieModule()
 	Globals.defaultWrapper("Insert pie module folder", PieTool.insertModuleFolder)
 end
 
-function ButtonFunctions.insertPiePackage()
-	Globals.defaultWrapper("Insert pie package", PieTool.insertPackage)
+function ButtonFunctions.insertPieCustomKit()
+	Globals.defaultWrapper("Insert pie custom kit", PieTool.insertCustomKit)
 end
 
 function ButtonFunctions.setUpPieTool()

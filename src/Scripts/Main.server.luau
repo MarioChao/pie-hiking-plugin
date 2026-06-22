@@ -99,7 +99,7 @@ setUpPluginWidgetButtons = function()
 	local scrollingFrame = Constants.pieHikingWidgetGui.ScrollingFrame
 	local pieFrame = scrollingFrame.PieFrame.Button_Frame
 	pieFrame.PieModuleInsertButton.MouseButton1Click:Connect(ButtonFunctions.insertPieModule)
-	pieFrame.PiePackageInsertButton.MouseButton1Click:Connect(ButtonFunctions.insertPiePackage)
+	pieFrame.PieCustomKitInsertButton.MouseButton1Click:Connect(ButtonFunctions.insertPieCustomKit)
 	pieFrame.PieToolSetUpButton.MouseButton1Click:Connect(ButtonFunctions.setUpPieTool)
 	pieFrame.PieToolClassicInsertButton.MouseButton1Click:Connect(ButtonFunctions.insertClassicPieTool)
 	pieFrame.PieToolBeginnerInsertButton.MouseButton1Click:Connect(ButtonFunctions.insertBeginnerPieTool)
@@ -124,7 +124,7 @@ setUpPluginWidgetUis = function()
 	MouseCursor.setPlugin(plugin)
 	local buttons = {
 		Constants.pieHikingWidgetGui.ScrollingFrame.PieFrame.Button_Frame.PieModuleInsertButton,
-		Constants.pieHikingWidgetGui.ScrollingFrame.PieFrame.Button_Frame.PiePackageInsertButton,
+		Constants.pieHikingWidgetGui.ScrollingFrame.PieFrame.Button_Frame.PieCustomKitInsertButton,
 		Constants.pieHikingWidgetGui.ScrollingFrame.PieFrame.Button_Frame.PieToolSetUpButton,
 		Constants.pieHikingWidgetGui.ScrollingFrame.PieFrame.Button_Frame.PieToolClassicInsertButton,
 		Constants.pieHikingWidgetGui.ScrollingFrame.PieFrame.Button_Frame.PieToolBeginnerInsertButton,

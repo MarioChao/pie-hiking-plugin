@@ -3,7 +3,13 @@
 TODO:
 - Simplify code for activators (ex: touch, zone).
 
-## [v1.5.0] Heart pie v2.0.2 + Refactored map kit | 2026/06/22
+## [v1.5.1] Pie custom kit button | 2026/06/22 (2)
+
+Added new button for inserting the [pie customization kit](https://create.roblox.com/store/asset/135707550833588/).
+
+Removed button for inserting the pie package.
+
+## [v1.5.0] Heart pie v2.0.2 + Refactored map kit | 2026/06/22 (1)
 
 Migrated pie tool to v2.0.2.
 
