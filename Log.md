@@ -3,7 +3,7 @@
 TODO:
 - Simplify code for activators (ex: touch, zone).
 
-## [v1.4.2] Heart pie v2.0.2 + Refactored map kit | 2026/06/22
+## [v1.5.0] Heart pie v2.0.2 + Refactored map kit | 2026/06/22
 
 Migrated pie tool to v2.0.2.
 
