@@ -13,12 +13,11 @@ local RunService = game:GetService("RunService")
 
 local PieMapKit_SharedStorage = script.Parent.Parent.Parent
 local _OtherModules = PieMapKit_SharedStorage:WaitForChild("OtherModules")
-local SpatialQuery = require(_OtherModules:WaitForChild("SpatialQuery"))
+local ContainerMechanic = require(_OtherModules:WaitForChild("ContainerMechanic"))
+local PriorityZoneGroup = require(_OtherModules:WaitForChild("PriorityZoneGroup"))
 
 
 ---------- Types ----------
-
-type ObjectConnections = {[Instance]: {RBXScriptConnection}}
 
 type AudioInfo = {
 	AssetId: number | string,
@@ -26,6 +25,12 @@ type AudioInfo = {
 	PlaybackRegion: NumberRange,
 	PlaybackSpeed: number,
 	Volume: number,
+}
+
+type MusicZoneConfig = {
+	configInstance: Instance,
+	getZonePriority: () -> number,
+	priorityUpdated: RBXScriptSignal,
 }
 
 
@@ -40,6 +45,8 @@ if RunService:IsClient() then
 	Constants.localPlayer = Players.LocalPlayer or Players:GetPropertyChangedSignal("LocalPlayer"):Wait()
 end
 
+Constants.configTagName = "MusicZoneConfig"
+
 Constants.mapKit_events = PieMapKit_SharedStorage:WaitForChild("MapKit_Events")
 Constants.musicBindable = Constants.mapKit_events:WaitForChild("MusicBindable")
 
@@ -50,51 +57,29 @@ table.freeze(Constants)
 
 local Globals = {}
 
--- Although no connections are made, this table is still used for accessing container instances
-Globals.taggedContainerConnections = {} :: {[Instance]: ObjectConnections}
+Globals.container_connections = {} :: {[Instance]: {RBXScriptConnection}?}
+Globals.container_configInstance = {} :: {[Instance]: Instance?}
+
+Globals.musicZoneGroup = PriorityZoneGroup.new("LocalPlayer", workspace)
 
 Globals.previousAudio = nil :: AudioInfo?
 
 
 ---------- Local functions ----------
 
-local createDefault
-local getPlayerParts
 local isSameAudio
 
 local getAudioInfo
 local playContainerMusic
 
-local isPlayerInZone
 local checkZonesLoopFrame
+
+local getConfigFromInstance
+local setUpContainer
+local cleanUpContainer
 
 
 ----- Helper functions -----
-
-createDefault = function<K, V>(table: {[K]: V}, key: K, default: V)
-	if not table[key] then
-		table[key] = default
-	end
-end
-
-getPlayerParts = function(player: Player)
-	-- Get character
-	local character = Constants.localPlayer and Constants.localPlayer.Character
-	if not character then
-		return {}
-	end
-
-	-- Add character parts to overlap param
-	local result = {}
-	for _, part in character:GetChildren() do
-		if not part:IsA("BasePart") then
-			continue
-		end
-		table.insert(result, part)
-	end
-
-	return result
-end
 
 isSameAudio = function(audio1: AudioInfo?, audio2: AudioInfo?)
 	if not audio1 or not audio2 then
@@ -118,39 +103,26 @@ end
 
 ----- Music functions -----
 
-getAudioInfo = function(container: Instance): AudioInfo
+getAudioInfo = function(parent: Instance): AudioInfo?
 	local result
-	if container:GetAttribute("FromSound") then
-		local sound = container:FindFirstChildWhichIsA("Sound")
-		if sound then
-			result = {
-				AssetId = sound.SoundId,
-				LoopRegion = sound.PlaybackRegionsEnabled and sound.LoopRegion or NumberRange.new(0),
-				PlaybackRegion = sound.PlaybackRegionsEnabled and sound.PlaybackRegion or NumberRange.new(0),
-				PlaybackSpeed = sound.PlaybackSpeed,
-				Volume = sound.Volume,
-			}
-		else
-			warn(`[Music Zones]: No sound instance found for "{container}!"`)
-		end
-	else
+	local sound = parent:FindFirstChildWhichIsA("Sound")
+	if sound then
 		result = {
-			AssetId = tostring(container:GetAttribute("Audio_AssetId")) :: string,
-			LoopRegion = container:GetAttribute("Audio_LoopRegion") :: NumberRange,
-			PlaybackRegion = container:GetAttribute("Audio_PlaybackRegion") :: NumberRange,
-			PlaybackSpeed = container:GetAttribute("Audio_PlaybackSpeed") :: number,
-			Volume = container:GetAttribute("Audio_Volume") :: number,
+			AssetId = sound.SoundId,
+			LoopRegion = sound.PlaybackRegionsEnabled and sound.LoopRegion or NumberRange.new(0),
+			PlaybackRegion = sound.PlaybackRegionsEnabled and sound.PlaybackRegion or NumberRange.new(0),
+			PlaybackSpeed = sound.PlaybackSpeed,
+			Volume = sound.Volume,
 		}
+	else
+		warn(`[Music Zones]: No sound instance found for "{parent}!"`)
 	end
 	return result
 end
 
-
--- Play music
-
 playContainerMusic = function(container: Instance)
 	-- Get music info
-	local audioInfo: AudioInfo = getAudioInfo(container)
+	local audioInfo = getAudioInfo(container)
 
 	-- Validate different music
 	if isSameAudio(Globals.previousAudio, audioInfo) then
@@ -165,60 +137,17 @@ end
 
 ----- Zone functions -----
 
--- Zone check
-
-isPlayerInZone = function(playerParts: {BasePart}, container: Instance)
-	-- Get zone parts
-	local zoneParts = {}
-	for _, part in container:GetChildren() do
-		if not part:IsA("BasePart") then
-			continue
-		end
-		table.insert(zoneParts, part)
-	end
-
-	-- Check zone contains player
-	local containedParts = SpatialQuery.getWhitelistedInParts(playerParts, zoneParts, "LocalPlayer")
-
-	-- Return result
-	return #containedParts > 0
-end
-
 checkZonesLoopFrame = function()
-	if not Constants.localPlayer then return end
-
-	-- Get player parts
-	local playerParts = getPlayerParts(Constants.localPlayer)
-
-	-- Validate player alive
-	if #playerParts == 0 then
+	-- Validate local player
+	if not Constants.localPlayer then
 		return
 	end
 
-	-- Get zones that contain the player
-	local highestPriority = nil
-	local priorityContainers: {[number]: {Instance}} = {}
-	for zoneContainer, _ in Globals.taggedContainerConnections do
-		-- Validate player in zone
-		if not isPlayerInZone(playerParts, zoneContainer) then
-			continue
-		end
-
-		-- Get container priority
-		local zonePriority: number = zoneContainer:GetAttribute("Zone_Priority") :: number
-
-		-- Update highest priority
-		if (not highestPriority) or zonePriority > highestPriority then
-			highestPriority = zonePriority
-		end
-
-		-- Store container at priority index
-		createDefault(priorityContainers, zonePriority, {})
-		table.insert(priorityContainers[zonePriority], zoneContainer)
-	end
+	-- Get player zones
+	local filteredZoneFolders = Globals.musicZoneGroup:getMaxPriorityZoneFolders_containPlayers({Constants.localPlayer})
 
 	-- Check if player not in any zone
-	if not highestPriority then
+	if not next(filteredZoneFolders) then
 		-- Validate different music
 		if not Globals.previousAudio then
 			return
@@ -231,46 +160,90 @@ checkZonesLoopFrame = function()
 	end
 
 	-- Select a container of highest priority
-	local filteredContainers = priorityContainers[highestPriority]
-	local selectedContainer = filteredContainers[Constants.randomGenerator:NextInteger(1, #filteredContainers)]
+	local selectedContainer = filteredZoneFolders[Constants.randomGenerator:NextInteger(1, #filteredZoneFolders)]
 
 	-- Play container music
-	playContainerMusic(selectedContainer)
-end
-
-
------ Container set up -----
-
-
--- The container
-
-local function setUpObjectContainer(container: Instance)
-	-- Validate client
-	if not RunService:IsClient() then
-		return
+	local configInstance = Globals.container_configInstance[selectedContainer]
+	if configInstance then
+		playContainerMusic(configInstance)
 	end
-
-	-- Set up connections
-	local objectConnections: ObjectConnections = {}
-	Globals.taggedContainerConnections[container] = objectConnections
 end
 
-local function cleanUpObjectContainer(container: Instance)
-	-- Disconnect and remove stored connections
-	if Globals.taggedContainerConnections[container] then
-		for object, connections in Globals.taggedContainerConnections[container] do
-			for _, connection in connections do
-				connection:Disconnect()
-			end
-			Globals.taggedContainerConnections[container][object] = nil
+
+----- Container mechanic -----
+
+getConfigFromInstance = function(configInstance: Instance): MusicZoneConfig
+    return {
+		configInstance = configInstance,
+		getZonePriority = function() return tonumber(configInstance:GetAttribute("ZonePriority")) or 0 end,
+		priorityUpdated = configInstance:GetAttributeChangedSignal("ZonePriority"),
+    }
+end
+
+setUpContainer = function(container: Instance, config: MusicZoneConfig)
+	-- Clean up connections
+	local existingConnections = Globals.container_connections[container]
+	if existingConnections then
+		for _, connection in existingConnections do
+			connection:Disconnect()
 		end
-		Globals.taggedContainerConnections[container] = nil
+	end
+	local newConnections = {}
+	Globals.container_connections[container] = newConnections
+
+	-- Store config instance
+	Globals.container_configInstance[container] = config.configInstance
+
+	-- Add to zone group
+	Globals.musicZoneGroup:addOrModifyZoneFolder(container, config.getZonePriority())
+
+	-- Listen to priority update
+	table.insert(newConnections, config.priorityUpdated:Connect(function()
+		-- Update zone priority
+		Globals.musicZoneGroup:addOrModifyZoneFolder(container, config.getZonePriority())
+	end))
+end
+
+cleanUpContainer = function(container: Instance)
+	-- Remove from zone group
+	Globals.musicZoneGroup:removeZoneFolder(container)
+
+	-- Clean up connections
+	local existingConnections = Globals.container_connections[container]
+	if existingConnections then
+		for _, connection in existingConnections do
+			connection:Disconnect()
+		end
+	end
+	Globals.container_connections[container] = nil
+
+	-- Clean up config instance
+	Globals.container_configInstance[container] = nil
+end
+
+
+----- Main -----
+
+local function main()
+	if RunService:IsClient() then
+		-- Set up container mechanic
+		local mechanic = ContainerMechanic.new(Constants.configTagName)
+		mechanic:setFunction_getConfigFromInstance(getConfigFromInstance)
+		mechanic:setFunction_setUpContainer(setUpContainer)
+		mechanic:setFunction_cleanUpContainer(cleanUpContainer)
+		mechanic:run()
+
+		-- Heartbeat check on zones
+		RunService.Heartbeat:Connect(checkZonesLoopFrame)
+	elseif RunService:IsServer() then
+		-- Do nothing
 	end
 end
 
-local function validateObject(object: Instance)
-	return object:IsA("Instance")
-end
+
+---------- Calling function ----------
+
+main()
 
 
 ---------- Module ----------
@@ -281,46 +254,12 @@ local Module = {}
 ----- Module fields -----
 
 function Module.addInstance(object: Instance)
-	-- Validate object
-	if not validateObject(object) then
-		return
-	end
-
-	-- Validate unique
-	if Globals.taggedContainerConnections[object] then
-		return
-	end
-
-	-- Set up object
-	setUpObjectContainer(object)
+	-- No need to do anything
 end
 
 function Module.removeInstance(object: Instance)
-	-- Validate object
-	if not validateObject(object) then
-		return
-	end
-
-	-- Clean up object
-	cleanUpObjectContainer(object)
+	-- No need to do anything
 end
-
-
----------- Set up function ----------
-
-local function initSetUp()
-	if RunService:IsClient() then
-		-- Heartbeat check on zones
-		RunService.Heartbeat:Connect(checkZonesLoopFrame)
-	elseif RunService:IsServer() then
-		-- Do nothing
-	end
-end
-
-
----------- Calling / connecting functions ----------
-
-initSetUp()
 
 
 ---------- Return module ----------

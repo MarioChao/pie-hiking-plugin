@@ -12,4 +12,6 @@ repository = "https://github.com/MarioChao/pie-hiking-plugin"
 private = true
 
 [dependencies]
+ContainerMechanic = "mariochao/container-mechanic@0.0.0"
+PriorityZoneGroup = "mariochao/priority-zone-group@1.0.0"
 UIUtil = "mariochao/ui-util@0.0.1"

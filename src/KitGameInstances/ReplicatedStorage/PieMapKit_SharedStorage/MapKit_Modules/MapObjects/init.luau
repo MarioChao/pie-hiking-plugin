@@ -10,13 +10,16 @@ local CollectionService = game:GetService("CollectionService")
 
 ---------- Imports ----------
 
-local BurnBricks = require(script.BurnBricks)
-local DamageBricks = require(script.DamageBricks)
-local HikeCheckpoints = require(script.HikeCheckpoints)
-local Invisible = require(script.Invisible)
-local PositionTeleporters = require(script.PositionTeleporters)
-local MusicZones = require(script.MusicZones)
-local LightingZones = require(script.LightingZones)
+local BurnBricks = require(script:WaitForChild("BurnBricks"))
+local DamageBricks = require(script:WaitForChild("DamageBricks"))
+local HikeCheckpoints = require(script:WaitForChild("HikeCheckpoints"))
+local Invisible = require(script:WaitForChild("Invisible"))
+local PositionTeleporters = require(script:WaitForChild("PositionTeleporters"))
+local MusicZones = require(script:WaitForChild("MusicZones"))
+local LightingZones = require(script:WaitForChild("LightingZones"))
+
+local LegacyLightingZones = require(script:WaitForChild("LegacyLightingZones"))
+local LegacyMusicZones = require(script:WaitForChild("LegacyMusicZones"))
 
 
 ---------- Types ----------
@@ -27,23 +30,42 @@ type ObjectModule = {
 }
 
 
----------- Variables ----------
+---------- Constants ----------
 
-local objectTagNames: {[string]: ObjectModule} = {
-	["BurnBrick"] = BurnBricks,
-	["DamageBrick"] = DamageBricks,
-	["HikeCheckpoint"] = HikeCheckpoints,
-	["PositionTeleporter"] = PositionTeleporters,
-	["MusicZone"] = MusicZones,
-	["Invisible"] = Invisible,
-	["LightingZone"] = LightingZones,
-}
+local Constants = {}
+
+do
+	local objectTag_module: {[string]: ObjectModule} = {
+		["BurnBrick"] = BurnBricks,
+		["DamageBrick"] = DamageBricks,
+		["HikeCheckpoint"] = HikeCheckpoints,
+		["PositionTeleporter"] = PositionTeleporters,
+		["Invisible"] = Invisible,
+
+		-- Container mechanics
+		["MusicZoneConfig"] = MusicZones,
+		["LightingZoneConfig"] = LightingZones,
+	
+		-- Legacy objects
+		["MusicZone"] = LegacyMusicZones,
+		["LightingZone"] = LegacyLightingZones,
+	}
+	table.freeze(objectTag_module)
+	Constants.objectTag_module = objectTag_module
+end
+
+table.freeze(Constants)
 
 
----------- Event functions ----------
+---------- Local functions ----------
 
-local function setUpTags()
-	for tagName, module in objectTagNames do
+local setUpTags
+
+
+----- Set up tags -----
+
+setUpTags = function()
+	for tagName, module in Constants.objectTag_module do
 		local tagged = CollectionService:GetTagged(tagName)
 		task.defer(function()
 			for _, object in tagged do
@@ -56,16 +78,16 @@ local function setUpTags()
 end
 
 
----------- Set up function ----------
+----- Main -----
 
-local function initSetUp()
+local function main()
 	setUpTags()
 end
 
 
----------- Calling / connecting functions ----------
+---------- Calling function ----------
 
-initSetUp()
+main()
 
 
 ---------- Return module ----------

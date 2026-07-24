@@ -9,5 +9,5 @@
 			}
 		}
 	},
-	"globIgnorePaths": ["**/wally.toml"]
+	"globIgnorePaths": ["**/wally.toml", "src/KitGameInstances/Packages"]
 }

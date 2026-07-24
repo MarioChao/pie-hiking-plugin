@@ -3,6 +3,16 @@
 TODO:
 - Simplify code for activators (ex: touch, zone).
 
+## [v1.6.0] Priority zone group migration | 2026/07/24
+
+Migrated `LightingZones` and `MusicZones` to use [PriorityZoneGroup](https://github.com/MarioChao/priority-zone-group).
+- Uses [ContainerMechanic](https://github.com/MarioChao/container-mechanic) with tags on child configurations.
+  - Separate configs: `LightingZoneConfig` and `MusicZoneConfig`.
+- Lighting & music are in different zone groups, meaning 1 zone folder can have separate zone priorities for lighting and for music.
+
+Legacy tags (`LightingZone` and `MusicZone`) are still supported.
+- The kit converts them into `LightingZoneConfig` and `MusicZoneConfig`.
+
 ## [v1.5.1] Pie custom kit button | 2026/06/22 (2)
 
 Added new button for inserting the [pie customization kit](https://create.roblox.com/store/asset/135707550833588/).
