@@ -3,6 +3,10 @@
 TODO:
 - Simplify code for activators (ex: touch, zone).
 
+## [v1.7.1] Heart pie v2.0.3 | 2026/08/03
+
+Migrated pie tool to v2.0.3, which fixed pie sticking to welded players.
+
 ## [v1.7.0] Zipline transportation system | 2026/08/02
 
 Added ziplines.
