@@ -3,6 +3,11 @@
 TODO:
 - Simplify code for activators (ex: touch, zone).
 
+## [v1.7.0] Zipline transportation system | 2026/08/02
+
+Added ziplines.
+- Imported [ZiplineTransport](https://github.com/MarioChao/zipline-transportation-system) v0.4.2 through wally.
+
 ## [v1.6.0] Priority zone group migration | 2026/07/24
 
 Migrated `LightingZones` and `MusicZones` to use [PriorityZoneGroup](https://github.com/MarioChao/priority-zone-group).

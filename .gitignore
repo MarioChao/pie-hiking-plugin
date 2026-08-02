@@ -4,9 +4,6 @@
 # Rojo build files
 /*.rbxm
 
-# Wally lock files
-wally.lock
-
 # Packages
 Packages
 
