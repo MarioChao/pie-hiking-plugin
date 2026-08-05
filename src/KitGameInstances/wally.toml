@@ -15,4 +15,4 @@ private = true
 ContainerMechanic = "mariochao/container-mechanic@0.0.0"
 PriorityZoneGroup = "mariochao/priority-zone-group@1.0.0"
 UIUtil = "mariochao/ui-util@0.0.1"
-ZiplineTransportationSystem = "mariochao/zipline-transportation-system@0.4.2"
+ZiplineTransportationSystem = "mariochao/zipline-transportation-system@0.5.0"

@@ -3,9 +3,13 @@
 TODO:
 - Simplify code for activators (ex: touch, zone).
 
+## [v1.7.2] Zipline transport v0.5.0 | 2026/08/05
+
+Migrated zipline transport to v0.5.0, which fixes major desyncs and adds end reverse waiting.
+
 ## [v1.7.1] Heart pie v2.0.3 | 2026/08/03
 
-Migrated pie tool to v2.0.3, which fixed pie sticking to welded players.
+Migrated pie tool to v2.0.3, which fixes pie sticking to welded players.
 
 ## [v1.7.0] Zipline transportation system | 2026/08/02
 
