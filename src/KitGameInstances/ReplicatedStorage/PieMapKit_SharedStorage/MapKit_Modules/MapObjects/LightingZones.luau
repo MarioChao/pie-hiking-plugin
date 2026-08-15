@@ -212,6 +212,7 @@ local function main()
 		mechanic:setFunction_getConfigFromInstance(getConfigFromInstance)
 		mechanic:setFunction_setUpContainer(setUpContainer)
 		mechanic:setFunction_cleanUpContainer(cleanUpContainer)
+		mechanic:setValidAncestors({workspace})
 		mechanic:run()
 
 		-- Heartbeat check on zones

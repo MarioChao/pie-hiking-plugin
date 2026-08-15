@@ -3,6 +3,15 @@
 TODO:
 - Simplify code for activators (ex: touch, zone).
 
+## [v1.7.3] Scoped loading | 2026/08/14
+
+All map objects are now loaded when under [Workspace](https://create.roblox.com/docs/reference/engine/classes/Workspace) and unloaded otherwise.
+- [Zipline transport](https://github.com/MarioChao/zipline-transportation-system) updated to v0.7.0.
+- [ContainerMechanic](https://github.com/MarioChao/container-mechanic) v0.2.0 with valid ancestors for `LightingZones` and `MusicZones`.
+- [ScopedCollection](https://github.com/MarioChao/scoped-collection) v1.0.0 with valid ancestors for all other objects.
+
+Fixed legacy music zones breaking if missing some attributes.
+
 ## [v1.7.2] Zipline transport v0.5.0 | 2026/08/05
 
 Migrated zipline transport to v0.5.0, which fixes major desyncs and adds end reverse waiting.

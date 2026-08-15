@@ -72,11 +72,11 @@ getAudioInfo = function(container: Instance): AudioInfo?
 		end
 	else
 		result = {
-			AssetId = tostring(container:GetAttribute("Audio_AssetId")) :: string,
-			LoopRegion = container:GetAttribute("Audio_LoopRegion") :: NumberRange,
-			PlaybackRegion = container:GetAttribute("Audio_PlaybackRegion") :: NumberRange,
-			PlaybackSpeed = container:GetAttribute("Audio_PlaybackSpeed") :: number,
-			Volume = container:GetAttribute("Audio_Volume") :: number,
+			AssetId = tostring(container:GetAttribute("Audio_AssetId")),
+			LoopRegion = container:GetAttribute("Audio_LoopRegion") :: NumberRange? or NumberRange.new(0),
+			PlaybackRegion = container:GetAttribute("Audio_PlaybackRegion") :: NumberRange? or NumberRange.new(0),
+			PlaybackSpeed = tonumber(container:GetAttribute("Audio_PlaybackSpeed")) or 1,
+			Volume = tonumber(container:GetAttribute("Audio_Volume")) or 1,
 		}
 	end
 	return result

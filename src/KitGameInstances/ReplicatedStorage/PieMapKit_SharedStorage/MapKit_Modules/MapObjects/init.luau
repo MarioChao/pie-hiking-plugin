@@ -3,12 +3,12 @@
 -- Map Objects Module
 
 
----------- Services ----------
-
-local CollectionService = game:GetService("CollectionService")
-
-
 ---------- Imports ----------
+
+local PieMapKit_SharedStorage = script.Parent.Parent
+
+local _OtherModules = PieMapKit_SharedStorage:WaitForChild("OtherModules")
+local ScopedCollection = require(_OtherModules:WaitForChild("ScopedCollection"))
 
 local BurnBricks = require(script:WaitForChild("BurnBricks"))
 local DamageBricks = require(script:WaitForChild("DamageBricks"))
@@ -54,6 +54,8 @@ do
 	Constants.objectTag_module = objectTag_module
 end
 
+Constants.validAncestors = {workspace}
+
 table.freeze(Constants)
 
 
@@ -66,14 +68,10 @@ local setUpTags
 
 setUpTags = function()
 	for tagName, module in Constants.objectTag_module do
-		local tagged = CollectionService:GetTagged(tagName)
-		task.defer(function()
-			for _, object in tagged do
-				module.addInstance(object)
-			end
-		end)
-		CollectionService:GetInstanceAddedSignal(tagName):Connect(module.addInstance)
-		CollectionService:GetInstanceRemovedSignal(tagName):Connect(module.removeInstance)
+		local collection = ScopedCollection.new(tagName, Constants.validAncestors)
+		collection:setFunction_onLoaded(module.addInstance)
+		collection:setFunction_onUnloaded(module.removeInstance)
+		collection:start()
 	end
 end
 
