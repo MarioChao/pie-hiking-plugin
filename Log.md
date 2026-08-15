@@ -3,7 +3,11 @@
 TODO:
 - Simplify code for activators (ex: touch, zone).
 
-## [v1.7.3] Scoped loading | 2026/08/14
+## [v1.7.4] Zipline transport v0.7.1 | 2026/08/14 (2)
+
+Migrated zipline transport to v0.7.1, which fixes cleaning up errors when ziplines are unloaded too quickly.
+
+## [v1.7.3] Scoped loading | 2026/08/14 (1)
 
 All map objects are now loaded when under [Workspace](https://create.roblox.com/docs/reference/engine/classes/Workspace) and unloaded otherwise.
 - [Zipline transport](https://github.com/MarioChao/zipline-transportation-system) updated to v0.7.0.
