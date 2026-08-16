@@ -3,6 +3,14 @@
 -- Main Client
 
 
+---------- Validate container ----------
+
+-- Replicated storage
+if not script:FindFirstAncestorWhichIsA("ReplicatedStorage") then
+	return
+end
+
+
 ---------- Imports ----------
 
 local LightingTypes = require(script.Parent:WaitForChild("Types"))
@@ -14,12 +22,12 @@ local UpdateLighting = require(script.Parent:WaitForChild("UpdateLighting"))
 local Constants = {}
 Constants.lightingRemoteEvent = script.Parent:WaitForChild("LightingRemoteEvent")
 Constants.remoteEventStrings = {
-    server = {
-        playerConnected = "Player Connected",
-    },
-    client = {
-        updateLighting = "Update Lighting",
-    },
+	server = {
+		playerConnected = "Player Connected",
+	},
+	client = {
+		updateLighting = "Update Lighting",
+	},
 }
 table.freeze(Constants.remoteEventStrings)
 
@@ -34,19 +42,19 @@ local onUpdateLighting
 ----- Lighting -----
 
 onUpdateLighting = function(lightingConfig: LightingTypes.LightingConfigType)
-    UpdateLighting.applyLightingConfig(lightingConfig, nil)
+	UpdateLighting.applyLightingConfig(lightingConfig, nil)
 end
 
 
 ----- Main -----
 
 local function main()
-    Constants.lightingRemoteEvent.OnClientEvent:Connect(function(mode: string, ...)
-        if mode == Constants.remoteEventStrings.client.updateLighting then
-            onUpdateLighting(...)
-        end
-    end)
-    Constants.lightingRemoteEvent:FireServer(Constants.remoteEventStrings.server.playerConnected)
+	Constants.lightingRemoteEvent.OnClientEvent:Connect(function(mode: string, ...)
+		if mode == Constants.remoteEventStrings.client.updateLighting then
+			onUpdateLighting(...)
+		end
+	end)
+	Constants.lightingRemoteEvent:FireServer(Constants.remoteEventStrings.server.playerConnected)
 end
 
 

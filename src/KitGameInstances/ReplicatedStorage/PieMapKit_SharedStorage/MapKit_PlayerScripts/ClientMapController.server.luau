@@ -13,43 +13,55 @@ end
 
 ---------- Services ----------
 
-local Debris = game:GetService("Debris")
-local ReplicatedStorage = script.Parent.Parent.Parent:FindFirstChild("ReplicatedStorage") or game:GetService("ReplicatedStorage")
-
-local PieMapKit_SharedStorage = ReplicatedStorage:WaitForChild("PieMapKit_SharedStorage")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 
 ---------- Imports ----------
+
+local PieMapKit_SharedStorage = ReplicatedStorage:WaitForChild("PieMapKit_SharedStorage")
 
 local MapKit_Modules = PieMapKit_SharedStorage:WaitForChild("MapKit_Modules")
 require(MapKit_Modules.MapObjects)
 
 
----------- Types ----------
+---------- Constants ----------
+
+local Constants = {}
+
+do
+	local MapKit_Events = PieMapKit_SharedStorage:WaitForChild("MapKit_Events")
+	Constants.loadDreamRemote = MapKit_Events.LoadDreamRemote
+end
+
+table.freeze(Constants)
 
 
----------- Instances ----------
+---------- Globals ----------
 
-local MapKit_Events = PieMapKit_SharedStorage:WaitForChild("MapKit_Events")
-local LoadDreamRemote = MapKit_Events.LoadDreamRemote
+local Globals = {}
 
-
----------- Variables ----------
-
-local clientMapFolders: {[Instance]: Folder} = {}
+Globals.dreamFolder_clientMap = {} :: {[Instance]: Instance}
 
 
 ---------- Local functions ----------
--- Define general functions here
 
-local function clearDream(dreamFolder: Instance)
-	if clientMapFolders[dreamFolder] then
-		Debris:AddItem(clientMapFolders[dreamFolder], 0)
-		clientMapFolders[dreamFolder] = nil
+local clearDream
+local loadClientDream
+local unloadDream
+
+local onLoadDreamClientEvent
+
+
+----- Dreams -----
+
+clearDream = function(dreamFolder: Instance)
+	if Globals.dreamFolder_clientMap[dreamFolder] then
+		Globals.dreamFolder_clientMap[dreamFolder]:Destroy()
+		Globals.dreamFolder_clientMap[dreamFolder] = nil
 	end
 end
 
-local function loadClientDream(dreamFolder: Instance, mapFolder: Folder)
+loadClientDream = function(dreamFolder: Instance, mapFolder: Instance)
 	-- Validate client dream
 	if not dreamFolder:GetAttribute("IsClientMap") then
 		return
@@ -60,22 +72,21 @@ local function loadClientDream(dreamFolder: Instance, mapFolder: Folder)
 
 	-- Clone a new client-sided map
 	local clientMap = mapFolder:Clone()
-	clientMapFolders[dreamFolder] = clientMap
+	Globals.dreamFolder_clientMap[dreamFolder] = clientMap
 
 	-- Load map
 	clientMap.Parent = workspace
 end
 
-local function unloadDream(dreamFolder: Instance)
+unloadDream = function(dreamFolder: Instance)
 	-- Clear the client map of the dream
 	clearDream(dreamFolder)
 end
 
 
----------- Event functions ----------
--- Functions that are directly connected by events or signals
+----- Event functions -----
 
-local function onLoadDreamClientEvent(action: string, ...)
+onLoadDreamClientEvent = function(action: string, ...)
 	if action == "LoadClientDream" then
 		loadClientDream(...)
 	elseif action == "UnloadDream" then
@@ -84,7 +95,13 @@ local function onLoadDreamClientEvent(action: string, ...)
 end
 
 
----------- Calling / connecting functions ----------
--- Connect functions to events and signals, then call set up functions
+----- Main -----
 
-LoadDreamRemote.OnClientEvent:Connect(onLoadDreamClientEvent)
+local function main()
+	Constants.loadDreamRemote.OnClientEvent:Connect(onLoadDreamClientEvent)
+end
+
+
+---------- Calling function ----------
+
+main()

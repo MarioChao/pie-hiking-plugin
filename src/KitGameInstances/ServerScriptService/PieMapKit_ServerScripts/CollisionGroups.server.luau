@@ -1,11 +1,11 @@
 --!strict
--- Collision Groups Script
+
+-- Collision Groups
 
 
 ---------- Validate container ----------
--- Validate the script's container before running any code
 
--- For some server scripts
+-- Server script service
 if not script:FindFirstAncestorWhichIsA("ServerScriptService") then
 	return
 end
@@ -26,9 +26,11 @@ type CollisionGroupData = {
 }
 
 
----------- Variables ----------
+---------- Constants ----------
 
-local CollisionGroupsTable: {CollisionGroupData} = {
+local Constants = {}
+
+Constants.collisionGroupsTable = {
 	{
 		GroupName = "Default",
 		CollidesWith = {"Default", "LocalPlayer"},
@@ -52,22 +54,29 @@ local CollisionGroupsTable: {CollisionGroupData} = {
 		CollidesWith = {"LocalPlayer"},
 		DoNotCollideWith = {"Default", "OtherPlayers", "OnlyCollidePlayer"},
 		DoNotCreate = false
-	}
-}
+	},
+} :: {CollisionGroupData}
+
+table.freeze(Constants)
 
 
 ---------- Local functions ----------
 
-local function setUpCollisionGroups()
+local setUpCollisionGroups
+
+
+----- Collision groups -----
+
+setUpCollisionGroups = function()
 	-- Register groups
-	for _, collisionGroupData in CollisionGroupsTable do
+	for _, collisionGroupData in Constants.collisionGroupsTable do
 		if not collisionGroupData.DoNotCreate then
 			PhysicsService:RegisterCollisionGroup(collisionGroupData.GroupName)
 		end
 	end
 
 	-- Set collidable
-	for _, collisionGroupData in CollisionGroupsTable do
+	for _, collisionGroupData in Constants.collisionGroupsTable do
 		for _, collideWithName in collisionGroupData.CollidesWith do
 			PhysicsService:CollisionGroupSetCollidable(collisionGroupData.GroupName, collideWithName, true)
 		end
@@ -78,6 +87,13 @@ local function setUpCollisionGroups()
 end
 
 
----------- Calling / connecting functions ----------
+----- Main -----
 
-setUpCollisionGroups()
+local function main()
+	setUpCollisionGroups()
+end
+
+
+---------- Calling function ----------
+
+main()

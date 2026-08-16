@@ -1,28 +1,19 @@
 --!strict
--- Damage Script
+
+-- Damage
 
 
 ---------- Validate container ----------
--- Validate the script's container before running any code
 
--- For some server scripts
+-- Server script service
 if not script:FindFirstAncestorWhichIsA("ServerScriptService") then
 	return
 end
 
 
----------- Services----------
+---------- Services ----------
 
-local ReplicatedStorage = script.Parent.Parent.Parent:FindFirstChild("ReplicatedStorage") or game:GetService("ReplicatedStorage")
-
-local PieMapKit_SharedStorage = ReplicatedStorage:FindFirstChild("PieMapKit_SharedStorage")
-
-
----------- Instances ----------
-
-local MapKit_Events = PieMapKit_SharedStorage.MapKit_Events
-local DamageBindable = MapKit_Events.DamageBindable
-local DamageRemote = MapKit_Events.DamageRemote
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 
 ---------- Constants ----------
@@ -31,15 +22,33 @@ local Constants = {}
 
 Constants.defaultDamageThrottle = 0.2
 
+do
+	local PieMapKit_SharedStorage = ReplicatedStorage:FindFirstChild("PieMapKit_SharedStorage")
+	local MapKit_Events = PieMapKit_SharedStorage.MapKit_Events
+	Constants.damageBindable = MapKit_Events.DamageBindable
+	Constants.damageRemote = MapKit_Events.DamageRemote
+end
 
----------- Variables ----------
+table.freeze(Constants)
+
+
+---------- Globals ----------
 
 local characterThrottle: {[Model]: boolean} = {}
 
 
 ---------- Local functions ----------
 
-local function onDamagePlayer(player: Player, amount: number)
+local onDamagePlayer
+local onDamageNpc
+
+local onDamageBindableEvent
+local onDamageServerEvent
+
+
+----- Damage -----
+
+onDamagePlayer = function(player: Player, amount: number)
 	-- Validate positive
 	if amount < 0 then
 		return
@@ -66,7 +75,7 @@ local function onDamagePlayer(player: Player, amount: number)
 	humanoid:TakeDamage(amount)
 end
 
-local function onDamageNpc(character: Model, amount: number)
+onDamageNpc = function(character: Model, amount: number)
 	-- Validate humanoid
 	local humanoid = character and character:FindFirstChildWhichIsA("Humanoid")
 	if not humanoid then
@@ -78,9 +87,9 @@ local function onDamageNpc(character: Model, amount: number)
 end
 
 
----------- Event functions ----------
+----- Damage events -----
 
-local function onDamageBindableEvent(action: string, ...)
+onDamageBindableEvent = function(action: string, ...)
 	if action == "DamagePlayer" then
 		onDamagePlayer(...)
 	elseif action == "DamageNpc" then
@@ -88,14 +97,21 @@ local function onDamageBindableEvent(action: string, ...)
 	end
 end
 
-local function onDamageServerEvent(caller: Player, action: string, ...)
+onDamageServerEvent = function(caller: Player, action: string, ...)
 	if action == "DamagePlayer" then
 		onDamagePlayer(caller, ...)
 	end
 end
 
 
----------- Calling / connecting functions ----------
+----- Main -----
 
-DamageBindable.Event:Connect(onDamageBindableEvent)
-DamageRemote.OnServerEvent:Connect(onDamageServerEvent)
+local function main()
+	Constants.damageBindable.Event:Connect(onDamageBindableEvent)
+	Constants.damageRemote.OnServerEvent:Connect(onDamageServerEvent)
+end
+
+
+---------- Calling function ----------
+
+main()

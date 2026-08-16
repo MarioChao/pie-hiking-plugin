@@ -2,6 +2,17 @@
 
 TODO:
 - Simplify code for activators (ex: touch, zone).
+- Revamp music system.
+
+## [v1.8.0] Map kit type check + Script cleanup | 2026/08/15
+
+Added typing for map kit.
+- Modified `default.project.json` to synchronize `ReplicatedStorage` and `ServerScriptService` from the map kit.
+- Moved plugin-only project to `dev.project.json`.
+
+Cleaned up several map kit scripts to follow the "validate-services-imports-types-constants-globals-functions-module" section format.
+
+Map kit scripts are no longer disabled initially.
 
 ## [v1.7.4] Zipline transport v0.7.1 | 2026/08/14 (2)
 

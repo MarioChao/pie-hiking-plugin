@@ -3,6 +3,14 @@
 	"tree": {
 		"$className": "DataModel",
 
+		"ReplicatedStorage": {
+			"$path": "src/KitGameInstances/ReplicatedStorage",
+			"$ignoreUnknownInstances": true
+		},
+		"ServerScriptService": {
+			"$path": "src/KitGameInstances/ServerScriptService",
+			"$ignoreUnknownInstances": true
+		},
 		"ServerStorage": {
 			"pie-hiking-plugin": {
 				"$path": "src"

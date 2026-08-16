@@ -1,11 +1,11 @@
 --!strict
--- Load Lighting Script
+
+-- Load Lighting
 
 
 ---------- Validate container ----------
--- Validate the script's container before running any code
 
--- For some server scripts
+-- Server script service
 if not script:FindFirstAncestorWhichIsA("ServerScriptService") then
 	return
 end
@@ -13,53 +13,79 @@ end
 
 ---------- Services----------
 
-local ReplicatedStorage = script.Parent.Parent.Parent:FindFirstChild("ReplicatedStorage") or game:GetService("ReplicatedStorage")
-
-local PieMapKit_SharedStorage = ReplicatedStorage:FindFirstChild("PieMapKit_SharedStorage")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 
 ---------- Imports ----------
+
+local PieMapKit_SharedStorage = ReplicatedStorage:FindFirstChild("PieMapKit_SharedStorage")
 
 local LightingModules = PieMapKit_SharedStorage:FindFirstChild("LightingModules")
 local LightingTypes = require(LightingModules.Types)
 local UpdateLighting = require(LightingModules.UpdateLighting)
 
 
----------- Instances ----------
+---------- Constants ----------
 
-local MapKit_Events = PieMapKit_SharedStorage:FindFirstChild("MapKit_Events")
-local LightingBindable = MapKit_Events.LightingBindable
+local Constants = {}
+
+do
+	local MapKit_Events = PieMapKit_SharedStorage:FindFirstChild("MapKit_Events")
+	Constants.lightingBindable = MapKit_Events.LightingBindable
+end
+
+table.freeze(Constants)
 
 
 ---------- Local functions ----------
 
-local function loadLighting(lightingConfig: LightingTypes.LightingConfigType, name: string)
+local loadLighting
+local loadDreamLighting
+
+local onLightingBindableEvent
+
+
+----- Load lighting -----
+
+loadLighting = function(lightingConfig: LightingTypes.LightingConfigType, name: string)
 	print(`[Load Lighting]: Loading {name}'s lighting configurations`)
 	UpdateLighting.applyLightingConfig(lightingConfig)
 end
 
-local function loadDreamLighting(dreamFolder: Instance)
+loadDreamLighting = function(dreamFolder: Instance)
 	-- Validate config
 	local configModule = dreamFolder:FindFirstChild("LightingConfig")
-	if not configModule then
+	if not (configModule and configModule:IsA("ModuleScript")) then
 		return
 	end
 
 	-- Load lighting
-	local lightingConfig: LightingTypes.LightingConfigType = require(configModule)
-	loadLighting(lightingConfig, dreamFolder.Name)
+	local success, _ = pcall(function()
+		local lightingConfig = require(configModule) :: LightingTypes.LightingConfigType
+		loadLighting(lightingConfig, dreamFolder.Name)
+	end)
+	if not success then
+		warn(`[Load Lighting]: Load dream lighting unsuccessful.`)
+	end
 end
 
 
----------- Event functions ----------
+----- Lighting event -----
 
-local function onLightingBindableEvent(action: string, ...)
+onLightingBindableEvent = function(action: string, ...)
 	if action == "LoadDreamLighting" then
 		loadDreamLighting(...)
 	end
 end
 
 
----------- Calling / connecting functions ----------
+----- Main -----
 
-LightingBindable.Event:Connect(onLightingBindableEvent)
+local function main()
+	Constants.lightingBindable.Event:Connect(onLightingBindableEvent)
+end
+
+
+---------- Calling function ----------
+
+main()

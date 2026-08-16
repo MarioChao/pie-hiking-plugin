@@ -1,0 +1,13 @@
+{
+	"name": "pie-hiking-plugin",
+	"tree": {
+		"$className": "DataModel",
+
+		"ServerStorage": {
+			"pie-hiking-plugin": {
+				"$path": "src"
+			}
+		}
+	},
+	"globIgnorePaths": ["**/wally.toml", "src/KitGameInstances/Packages"]
+}

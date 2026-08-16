@@ -1,9 +1,6 @@
 --!strict
+
 -- Dream Maps Module
-
-
----------- Module ----------
-local DreamMaps = {}
 
 
 ---------- Services ----------
@@ -11,65 +8,58 @@ local DreamMaps = {}
 local CollectionService = game:GetService("CollectionService")
 
 
----------- Types ----------
-
-
----------- Instances ----------
-
-
-
 ---------- Constants ----------
 
 local Constants = {}
+
 Constants.dreamFolderTagName = "DreamFolder"
 Constants.mapTagName = "HikeMap"
+
+Constants.dreamAdded_BE = Instance.new("BindableEvent")
+Constants.dreamRemoved_BE = Instance.new("BindableEvent")
 
 table.freeze(Constants)
 
 
----------- Variables ----------
+---------- Globals ----------
 
-local storedDreamFolders: {Instance} = {}
+local Globals = {}
 
-
----------- Module variables ----------
-
--- Fires when a new dream folder is stored (tagged)
-DreamMaps.dreamAdded = Instance.new("BindableEvent")
-
--- Fires when a dream folder is removed (untagged)
-DreamMaps.dreamRemoved = Instance.new("BindableEvent")
+Globals.dreamFolder_isStored = {} :: {[Instance]: true?}
 
 
 ---------- Local functions ----------
--- Define general functions here
+
+local getIsDreamFolder
+
+local onMapAdded
+local onMapRemoved
 
 
 ----- Dreams -----
 
-local function getIsDreamFolder(object: Instance): boolean
+getIsDreamFolder = function(object: Instance): boolean
 	return object and (object:HasTag(Constants.dreamFolderTagName) or object:GetAttribute("DreamDifficulty") ~= nil)
 end
 
 
------ Event functions -----
--- Functions that are directly connected by events or signals
+----- Maps -----
 
-local function onMapAdded(map: Folder)
+onMapAdded = function(map: Instance)
 	-- Validate dream
 	local dreamFolder = map.Parent
 	if not (dreamFolder and getIsDreamFolder(dreamFolder)) then
 		return
 	end
 
-	-- Save dream
-	table.insert(storedDreamFolders, dreamFolder)
+	-- Store dream
+	Globals.dreamFolder_isStored[dreamFolder] = true
 
-	-- Event
-	DreamMaps.dreamAdded:Fire(dreamFolder)
+	-- Fire event
+	Constants.dreamAdded_BE:Fire(dreamFolder)
 end
 
-local function onMapRemoved(map: Folder)
+onMapRemoved = function(map: Instance)
 	-- Validate dream
 	local dreamFolder = map.Parent
 	if not (dreamFolder and getIsDreamFolder(dreamFolder)) then
@@ -77,22 +67,16 @@ local function onMapRemoved(map: Folder)
 	end
 
 	-- Remove dream
-	table.remove(storedDreamFolders, table.find(storedDreamFolders, dreamFolder))
+	Globals.dreamFolder_isStored[dreamFolder] = nil
 
-	-- Event
-	DreamMaps.dreamRemoved:Fire(dreamFolder)
+	-- Fire event
+	Constants.dreamRemoved_BE:Fire(dreamFolder)
 end
 
 
------ Module functions -----
+----- Main -----
 
-function DreamMaps.getAllDreams()
-	return storedDreamFolders
-end
-
-
------ Set up function -----
-local function initSetUp()
+local function main()
 	-- Tags
 	local tagged = CollectionService:GetTagged(Constants.mapTagName)
 	task.defer(function()
@@ -105,11 +89,39 @@ local function initSetUp()
 end
 
 
----------- Calling / connecting functions ----------
--- Connect functions to events and signals, then call set up functions
+---------- Calling function ----------
 
-task.defer(initSetUp)
+task.defer(main)
+
+
+---------- Module ----------
+
+local DreamMaps = {}
+
+
+----- Module fields -----
+
+-- Fires when a new dream folder is stored (tagged)
+DreamMaps.dreamAdded = Constants.dreamAdded_BE
+
+-- Fires when a dream folder is removed (untagged)
+DreamMaps.dreamRemoved = Constants.dreamRemoved_BE
+
+
+----- Module functions -----
+
+function DreamMaps.getAllDreams()
+	local result = {}
+	for dreamFolder, isStored in Globals.dreamFolder_isStored do
+		if isStored then
+			table.insert(result, dreamFolder)
+		end
+	end
+	return result
+end
 
 
 ---------- Return module ----------
+
+table.freeze(DreamMaps)
 return DreamMaps
