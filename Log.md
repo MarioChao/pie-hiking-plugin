@@ -4,6 +4,12 @@ TODO:
 - Simplify code for activators (ex: touch, zone).
 - Revamp music system.
 
+## [v1.9.1] Readme credits | 2026/08/19
+
+Added dependencies and a special thanks to [EToH Kit](https://etohgame.github.io/kit/) to the README credits.
+
+Added the [pie setup video guide](https://www.youtube.com/shorts/IdNriG-9SFE) to README.
+
 ## [v1.9.0] Music gui | 2026/08/18 - 08/19
 
 Added a music `ScreenGui`:
