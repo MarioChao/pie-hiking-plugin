@@ -2,6 +2,9 @@
     "tree": {
         "$path": "../../../Packages",
 
+        "AutoUIScale": {
+            "$path": "AutoUIScale"
+        },
         "InstanceTween": {
             "$path": "InstanceTween"
         }

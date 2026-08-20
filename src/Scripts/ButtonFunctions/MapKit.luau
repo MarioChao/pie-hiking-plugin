@@ -8,6 +8,7 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Selection = game:GetService("Selection")
 local ServerScriptService = game:GetService("ServerScriptService")
+local StarterGui = game:GetService("StarterGui")
 
 
 ---------- Types ----------
@@ -72,14 +73,22 @@ cloneReparentRecursive = function(oldParent: Instance, newParent: Instance, doNo
 	local addedInstances = {}
 	for _, child in oldParent:GetChildren() do
 		-- Check do not replace
-		if doNotReplacePaths[child.Name] then
+		if doNotReplacePaths["*"] or doNotReplacePaths[child.Name] then
 			-- Replace if not found
 			local replacedObject = replaceIfNotFound(newParent, child)
 			table.insert(addedInstances, replacedObject)
 
+			-- Get recursive do not replace paths
+			local nextDoNotReplacePaths
+			if doNotReplacePaths[child.Name] then
+				nextDoNotReplacePaths = doNotReplacePaths[child.Name]
+			else
+				nextDoNotReplacePaths = {["*"] = {}}
+			end
+
 			-- Reparent recursive
 			local newParentChild = newParent:FindFirstChild(child.Name) or replacedObject
-			local tempInstances = cloneReparentRecursive(child, newParentChild, doNotReplacePaths[child.Name])
+			local tempInstances = cloneReparentRecursive(child, newParentChild, nextDoNotReplacePaths)
 			table.move(tempInstances, 1, #tempInstances, #addedInstances + 1, addedInstances)
 			continue
 		end
@@ -131,6 +140,15 @@ setUpMapKitContainers = function(): {Instance}
 
 	-- Server script service
 	tempInstances = cloneReparentRecursive(containerScripts.ServerScriptService, ServerScriptService, {})
+	table.move(tempInstances, 1, #tempInstances, #addedInstances + 1, addedInstances)
+	for _, object in tempInstances do
+		enableDescendantScripts(object)
+	end
+
+	-- Starter gui
+	tempInstances = cloneReparentRecursive(containerScripts.StarterGui, StarterGui, {
+		["*"] = {}
+	})
 	table.move(tempInstances, 1, #tempInstances, #addedInstances + 1, addedInstances)
 	for _, object in tempInstances do
 		enableDescendantScripts(object)

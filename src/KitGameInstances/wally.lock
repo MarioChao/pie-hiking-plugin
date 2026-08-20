@@ -20,7 +20,12 @@ dependencies = []
 [[package]]
 name = "mariochao/pie-hiking-plugin"
 version = "0.0.0"
-dependencies = [["ContainerMechanic", "mariochao/container-mechanic@0.2.0"], ["PriorityZoneGroup", "mariochao/priority-zone-group@1.0.0"], ["ScopedCollection", "mariochao/scoped-collection@1.0.0"], ["UIUtil", "mariochao/ui-util@0.0.1"], ["ZiplineTransportationSystem", "mariochao/zipline-transportation-system@0.7.1"]]
+dependencies = [["ContainerMechanic", "mariochao/container-mechanic@0.2.0"], ["PresetStarterGui", "mariochao/preset-starter-gui@0.0.0"], ["PriorityZoneGroup", "mariochao/priority-zone-group@1.0.0"], ["ScopedCollection", "mariochao/scoped-collection@1.0.0"], ["UIUtil", "mariochao/ui-util@0.0.1"], ["ZiplineTransportationSystem", "mariochao/zipline-transportation-system@0.7.1"]]
+
+[[package]]
+name = "mariochao/preset-starter-gui"
+version = "0.0.0"
+dependencies = []
 
 [[package]]
 name = "mariochao/priority-zone-group"

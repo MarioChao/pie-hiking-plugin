@@ -15,6 +15,10 @@
 			"pie-hiking-plugin": {
 				"$path": "src"
 			}
+		},
+		"StarterGui": {
+			"$path": "src/KitGameInstances/StarterGui",
+			"$ignoreUnknownInstances": true
 		}
 	},
 	"globIgnorePaths": ["**/wally.toml", "src/KitGameInstances/Packages"]

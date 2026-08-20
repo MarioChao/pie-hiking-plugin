@@ -4,6 +4,19 @@ TODO:
 - Simplify code for activators (ex: touch, zone).
 - Revamp music system.
 
+## [v1.9.0] Music gui | 2026/08/18 - 08/19
+
+Added a music `ScreenGui`:
+- Displays the artist and title of the playing music via [AssetService](https://create.roblox.com/docs/reference/engine/classes/AssetService).
+- Allows muting by clicking on the icon.
+- Easily customized through `StarterGui > MapKitMusic_ScreenGui`.
+
+Added wally import for [PresetStarterGui](https://github.com/MarioChao/preset-starter-gui) for setting up preset guis from the `StarterGui` container.
+
+Added new `AutoUIScale` module for automatically setting `UIScale.Scale` based on screen gui's size.
+
+Fixed wiring of audio instances.
+
 ## [v1.8.0] Map kit type check + Script cleanup | 2026/08/15
 
 Added typing for map kit.
