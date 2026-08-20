@@ -4,6 +4,12 @@ TODO:
 - Simplify code for activators (ex: touch, zone).
 - Revamp music system.
 
+## [v1.9.2] Musi gui adjustments | 2026/08/20
+
+Adjusted the music gui auto scale to `UnitSize` of 1200x600 and `ScaleRange` of (0.6, 1).
+
+Set the music screen gui display order to 50.
+
 ## [v1.9.1] Readme credits | 2026/08/19
 
 Added dependencies and a special thanks to [EToH Kit](https://etohgame.github.io/kit/) to the README credits.

@@ -420,7 +420,7 @@ setScreenGuiAutoScale = function()
 			result = value
 		else
 			warn(`[Music]: No 'UnitSize' attribute (type 'Vector2') found for '{uiScale}'.`)
-			result = Vector2.new(1000, 300)
+			result = Vector2.new(1200, 600)
 		end
 		return result
 	end)()
@@ -431,7 +431,7 @@ setScreenGuiAutoScale = function()
 			result = value
 		else
 			warn(`[Music]: No 'ScaleRange' attribute (type 'NumberRange') found for '{uiScale}'.`)
-			result = NumberRange.new(0.3, 2)
+			result = NumberRange.new(0.6, 1)
 		end
 		return result
 	end)()
