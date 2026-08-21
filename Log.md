@@ -4,11 +4,11 @@ TODO:
 - Simplify code for activators (ex: touch, zone).
 - Revamp music system.
 
-## [v1.9.3] Musi gui scale adjustment | 2026/08/20 (2)
+## [v1.9.3] Music gui scale adjustment | 2026/08/20 (2)
 
 Modified the music gui autoscale to `ScaleRange` of (0.6, 0.8).
 
-## [v1.9.2] Musi gui adjustments | 2026/08/20 (1)
+## [v1.9.2] Music gui adjustments | 2026/08/20 (1)
 
 Adjusted the music gui auto scale to `UnitSize` of 1200x600 and `ScaleRange` of (0.6, 1).
 
