@@ -431,7 +431,7 @@ setScreenGuiAutoScale = function()
 			result = value
 		else
 			warn(`[Music]: No 'ScaleRange' attribute (type 'NumberRange') found for '{uiScale}'.`)
-			result = NumberRange.new(0.6, 1)
+			result = NumberRange.new(0.6, 0.8)
 		end
 		return result
 	end)()
