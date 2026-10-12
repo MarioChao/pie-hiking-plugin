@@ -4,6 +4,10 @@ TODO:
 - Simplify code for activators (ex: touch, zone).
 - Revamp music system.
 
+## [v1.9.4] Initial auto scale fix | 2026/10/12
+
+Fixed music gui sometimes not getting scaled correctly initially.
+
 ## [v1.9.3] Music gui scale adjustment | 2026/08/20 (2)
 
 Modified the music gui autoscale to `ScaleRange` of (0.6, 0.8).

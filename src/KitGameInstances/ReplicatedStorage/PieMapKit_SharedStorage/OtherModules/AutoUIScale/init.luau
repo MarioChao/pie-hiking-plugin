@@ -47,6 +47,7 @@ function Module.setScreenGuiAutoScale(screenGui: ScreenGui, uiScale: UIScale, un
     Globals.screenGui_sizeChangedConnection[screenGui] = screenGui:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
         autoScaleScreenGui(screenGui, uiScale, unitSize, scaleRange)
     end)
+    autoScaleScreenGui(screenGui, uiScale, unitSize, scaleRange)
 end
 
 
