@@ -4,6 +4,13 @@ TODO:
 - Simplify code for activators (ex: touch, zone).
 - Revamp music system.
 
+## [v1.9.5] Zipline transport v0.7.2 | 2026/10/18
+
+Migrated zipline transport to v0.7.2, which fixes kit errors when using the new PlayerModule with [InputActionSystem](https://create.roblox.com/docs/input/input-action-system).
+- It uses an updated [ClientMovementDetector](https://github.com/MarioChao/client-movement-detector) that supports the new PlayerModule.
+- Added temporary fix for streaming-enabled experiences.
+- Added support for zero-length ziplines.
+
 ## [v1.9.4] Initial auto scale fix | 2026/10/12
 
 Fixed music gui sometimes not getting scaled correctly initially.
